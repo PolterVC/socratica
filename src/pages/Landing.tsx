@@ -2,7 +2,6 @@ import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
-import { BookOpen, ClipboardCheck, Users, FileText, MessageSquare, GraduationCap, CheckCircle2 } from "lucide-react";
 
 const Landing = () => {
   return (
@@ -36,13 +35,13 @@ const Landing = () => {
               <div className="bg-card p-8">
                 <div className="grid grid-cols-3 gap-4 mb-4">
                   <div className="h-32 bg-primary/10 rounded-lg flex items-center justify-center">
-                    <BookOpen className="h-12 w-12 text-primary" />
+                    <span className="text-2xl font-bold text-primary">01</span>
                   </div>
                   <div className="h-32 bg-primary/10 rounded-lg flex items-center justify-center">
-                    <ClipboardCheck className="h-12 w-12 text-primary" />
+                    <span className="text-2xl font-bold text-primary">02</span>
                   </div>
                   <div className="h-32 bg-primary/10 rounded-lg flex items-center justify-center">
-                    <Users className="h-12 w-12 text-primary" />
+                    <span className="text-2xl font-bold text-primary">03</span>
                   </div>
                 </div>
                 <div className="text-sm text-muted-foreground">
@@ -60,7 +59,6 @@ const Landing = () => {
             <div className="grid md:grid-cols-3 gap-8">
               <Card>
                 <CardHeader>
-                  <ClipboardCheck className="h-10 w-10 text-primary mb-4" />
                   <CardTitle>Curriculum Restructuring</CardTitle>
                   <CardDescription>
                     AI-safe assessments, oral exams, and project rotations to maintain academic integrity
@@ -70,7 +68,6 @@ const Landing = () => {
               
               <Card>
                 <CardHeader>
-                  <Users className="h-10 w-10 text-primary mb-4" />
                   <CardTitle>Classroom Engagement</CardTitle>
                   <CardDescription>
                     Auto-generate quizzes from your readings and keep students actively participating
@@ -80,7 +77,6 @@ const Landing = () => {
               
               <Card>
                 <CardHeader>
-                  <FileText className="h-10 w-10 text-primary mb-4" />
                   <CardTitle>Faculty Enablement</CardTitle>
                   <CardDescription>
                     AI policy templates and implementation guides tailored to your discipline
@@ -112,37 +108,25 @@ const Landing = () => {
             <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
               <Card>
                 <CardContent className="pt-6">
-                  <div className="flex items-start gap-3">
-                    <MessageSquare className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
-                    <p>Replace generic essays with oral or in-class defenses</p>
-                  </div>
+                  <p>Replace generic essays with oral or in-class defenses</p>
                 </CardContent>
               </Card>
               
               <Card>
                 <CardContent className="pt-6">
-                  <div className="flex items-start gap-3">
-                    <FileText className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
-                    <p>Add AI policy to syllabus with clear guidelines</p>
-                  </div>
+                  <p>Add AI policy to syllabus with clear guidelines</p>
                 </CardContent>
               </Card>
               
               <Card>
                 <CardContent className="pt-6">
-                  <div className="flex items-start gap-3">
-                    <CheckCircle2 className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
-                    <p>Add auto MC and short response checks to every class</p>
-                  </div>
+                  <p>Add auto MC and short response checks to every class</p>
                 </CardContent>
               </Card>
               
               <Card>
                 <CardContent className="pt-6">
-                  <div className="flex items-start gap-3">
-                    <ClipboardCheck className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
-                    <p>Rotate quiz banks and implement authentic assessments</p>
-                  </div>
+                  <p>Rotate quiz banks and implement authentic assessments</p>
                 </CardContent>
               </Card>
             </div>
@@ -175,9 +159,8 @@ const Landing = () => {
       <footer className="border-t py-8 px-4">
         <div className="container mx-auto max-w-6xl">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="flex items-center gap-2 font-semibold">
-              <GraduationCap className="h-5 w-5 text-primary" />
-              <span>LiveQuiz</span>
+            <div className="font-semibold text-lg">
+              LiveQuiz
             </div>
             <div className="flex gap-6">
               <Link to="/consulting" className="text-sm text-muted-foreground hover:text-primary">
