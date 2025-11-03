@@ -12,6 +12,7 @@ import SocialScience from "./pages/SocialScience";
 import ProfessionalPrograms from "./pages/ProfessionalPrograms";
 import LawPolicy from "./pages/LawPolicy";
 import About from "./pages/About";
+import CaseStudies from "./pages/CaseStudies";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +33,7 @@ const App = () => (
           <Route path="/professional-programs" element={<ProfessionalPrograms />} />
           <Route path="/law-policy" element={<LawPolicy />} />
           <Route path="/about" element={<About />} />
+          <Route path="/case-studies" element={<CaseStudies />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

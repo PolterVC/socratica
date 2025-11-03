@@ -97,21 +97,42 @@ const Landing = () => {
         <section className="py-20 px-4 border-t">
           <div className="container mx-auto max-w-6xl">
             <h2 className="text-3xl font-bold text-center mb-12">Who it's for</h2>
-            <div className="flex flex-wrap gap-6 justify-center text-lg">
-              <Link to="/business" className="text-muted-foreground hover:text-primary transition-colors">
+            <div className="flex flex-wrap gap-4 justify-center text-lg">
+              <Link 
+                to="/business" 
+                className="px-6 py-3 border rounded-lg hover:border-primary hover:bg-primary/5 transition-all cursor-pointer"
+              >
                 Business
               </Link>
-              <Link to="/humanities" className="text-muted-foreground hover:text-primary transition-colors">
+              <Link 
+                to="/humanities" 
+                className="px-6 py-3 border rounded-lg hover:border-primary hover:bg-primary/5 transition-all cursor-pointer"
+              >
                 Humanities
               </Link>
-              <Link to="/social-science" className="text-muted-foreground hover:text-primary transition-colors">
+              <Link 
+                to="/social-science" 
+                className="px-6 py-3 border rounded-lg hover:border-primary hover:bg-primary/5 transition-all cursor-pointer"
+              >
                 Social Science
               </Link>
-              <Link to="/professional-programs" className="text-muted-foreground hover:text-primary transition-colors">
+              <Link 
+                to="/professional-programs" 
+                className="px-6 py-3 border rounded-lg hover:border-primary hover:bg-primary/5 transition-all cursor-pointer"
+              >
                 Professional Programs
               </Link>
-              <Link to="/law-policy" className="text-muted-foreground hover:text-primary transition-colors">
+              <Link 
+                to="/law-policy" 
+                className="px-6 py-3 border rounded-lg hover:border-primary hover:bg-primary/5 transition-all cursor-pointer"
+              >
                 Law & Policy
+              </Link>
+              <Link 
+                to="/case-studies" 
+                className="px-6 py-3 border rounded-lg hover:border-primary hover:bg-primary/5 transition-all cursor-pointer"
+              >
+                Case Studies
               </Link>
             </div>
           </div>
