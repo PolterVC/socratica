@@ -2,7 +2,7 @@ import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
-import { BookOpen, Shield, Zap, Users, FileText, MessageSquare, GraduationCap } from "lucide-react";
+import { BookOpen, ClipboardCheck, Users, FileText, MessageSquare, GraduationCap, CheckCircle2 } from "lucide-react";
 
 const Landing = () => {
   return (
@@ -39,10 +39,10 @@ const Landing = () => {
                     <BookOpen className="h-12 w-12 text-primary" />
                   </div>
                   <div className="h-32 bg-primary/10 rounded-lg flex items-center justify-center">
-                    <Shield className="h-12 w-12 text-primary" />
+                    <ClipboardCheck className="h-12 w-12 text-primary" />
                   </div>
                   <div className="h-32 bg-primary/10 rounded-lg flex items-center justify-center">
-                    <Zap className="h-12 w-12 text-primary" />
+                    <Users className="h-12 w-12 text-primary" />
                   </div>
                 </div>
                 <div className="text-sm text-muted-foreground">
@@ -60,7 +60,7 @@ const Landing = () => {
             <div className="grid md:grid-cols-3 gap-8">
               <Card>
                 <CardHeader>
-                  <Shield className="h-10 w-10 text-primary mb-4" />
+                  <ClipboardCheck className="h-10 w-10 text-primary mb-4" />
                   <CardTitle>Curriculum Restructuring</CardTitle>
                   <CardDescription>
                     AI-safe assessments, oral exams, and project rotations to maintain academic integrity
@@ -70,7 +70,7 @@ const Landing = () => {
               
               <Card>
                 <CardHeader>
-                  <Zap className="h-10 w-10 text-primary mb-4" />
+                  <Users className="h-10 w-10 text-primary mb-4" />
                   <CardTitle>Classroom Engagement</CardTitle>
                   <CardDescription>
                     Auto-generate quizzes from your readings and keep students actively participating
@@ -131,7 +131,7 @@ const Landing = () => {
               <Card>
                 <CardContent className="pt-6">
                   <div className="flex items-start gap-3">
-                    <Zap className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
+                    <CheckCircle2 className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
                     <p>Add auto MC and short response checks to every class</p>
                   </div>
                 </CardContent>
@@ -140,7 +140,7 @@ const Landing = () => {
               <Card>
                 <CardContent className="pt-6">
                   <div className="flex items-start gap-3">
-                    <Shield className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
+                    <ClipboardCheck className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
                     <p>Rotate quiz banks and implement authentic assessments</p>
                   </div>
                 </CardContent>
