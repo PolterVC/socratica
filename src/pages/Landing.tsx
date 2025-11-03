@@ -98,84 +98,35 @@ const Landing = () => {
           <div className="container mx-auto max-w-6xl">
             <h2 className="text-3xl font-bold text-center mb-12">Who it's for</h2>
             <div className="flex flex-wrap gap-6 justify-center text-lg">
-              {["Business", "Humanities", "Social Science", "Professional Programs", "Law & Policy"].map(tag => <span key={tag} className="text-muted-foreground">
-                  {tag}
-                </span>)}
+              <Link to="/business" className="text-muted-foreground hover:text-primary transition-colors">
+                Business
+              </Link>
+              <Link to="/humanities" className="text-muted-foreground hover:text-primary transition-colors">
+                Humanities
+              </Link>
+              <Link to="/social-science" className="text-muted-foreground hover:text-primary transition-colors">
+                Social Science
+              </Link>
+              <Link to="/professional-programs" className="text-muted-foreground hover:text-primary transition-colors">
+                Professional Programs
+              </Link>
+              <Link to="/law-policy" className="text-muted-foreground hover:text-primary transition-colors">
+                Law & Policy
+              </Link>
             </div>
           </div>
         </section>
         
-        {/* Example Outcomes */}
-        
-        
-        {/* About Us */}
+        {/* About Us Preview */}
         <section className="py-20 px-4 border-t">
-          <div className="container mx-auto max-w-6xl">
-            <h2 className="text-3xl font-bold text-center mb-8">About us</h2>
-            <p className="text-center text-lg text-muted-foreground mb-16 max-w-3xl mx-auto">
+          <div className="container mx-auto max-w-6xl text-center">
+            <h2 className="text-3xl font-bold mb-6">About us</h2>
+            <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
               We are a team of 5 McGill students dedicated to helping teachers catch up to AI. We built LiveQuiz to help Professors at McGill and the University of Montreal bring critical thinking back into education.
             </p>
-            
-            <h3 className="text-2xl font-bold text-center mb-12">Our team</h3>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-8 max-w-5xl mx-auto">
-              <div>
-                <h4 className="font-bold">Megan Curadeau</h4>
-                <p className="text-sm text-muted-foreground mb-2">CEO</p>
-                <p className="text-sm">A fierce marketer</p>
-              </div>
-              
-              <div>
-                <h4 className="font-bold">Helena Ristanovic Clifford</h4>
-                <p className="text-sm text-muted-foreground mb-2">CTO</p>
-                <p className="text-sm">Tech mogul bringing founder experience</p>
-              </div>
-              
-              <div>
-                <h4 className="font-bold">Christine Wu</h4>
-                <p className="text-sm text-muted-foreground mb-2">COO</p>
-                <p className="text-sm">Ex-founder and venture expert</p>
-              </div>
-              
-              <div>
-                <h4 className="font-bold">Ashley Li</h4>
-                <p className="text-sm text-muted-foreground mb-2">CMO</p>
-                <p className="text-sm">Political thought leader turned entrepreneur</p>
-              </div>
-              
-              <div>
-                <h4 className="font-bold">Eli Polterovich</h4>
-                <p className="text-sm text-muted-foreground mb-2">CRO</p>
-                <p className="text-sm">Previously built ventures in Edtech</p>
-              </div>
-              
-              <div>
-                <h4 className="font-bold">Various Advisors & Experts</h4>
-                <p className="text-sm text-muted-foreground mb-2">Collaboration</p>
-                <p className="text-sm">In collaboration with the education faculty at McGill</p>
-              </div>
-            </div>
-          </div>
-        </section>
-        
-        {/* CTA Section */}
-        <section className="py-20 px-4 bg-primary text-primary-foreground">
-          <div className="container mx-auto max-w-4xl text-center">
-            <h2 className="text-3xl font-bold mb-6">Ready to adapt your course?</h2>
-            <p className="text-lg mb-8 opacity-90">
-              Start with our AI consulting tool or explore engagement features
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/consulting">
-                <Button size="lg" variant="secondary" className="text-lg px-8">
-                  Get Your Plan
-                </Button>
-              </Link>
-              <Link to="/engagement">
-                <Button size="lg" variant="outline" className="text-lg px-8 bg-transparent border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10">
-                  Try Engagement Tools
-                </Button>
-              </Link>
-            </div>
+            <Link to="/about">
+              <Button variant="outline" size="lg">Learn More About Our Team</Button>
+            </Link>
           </div>
         </section>
       </main>
@@ -192,6 +143,9 @@ const Landing = () => {
               </Link>
               <Link to="/engagement" className="text-sm text-muted-foreground hover:text-primary">
                 Engagement
+              </Link>
+              <Link to="/about" className="text-sm text-muted-foreground hover:text-primary">
+                About
               </Link>
             </div>
           </div>

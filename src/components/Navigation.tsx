@@ -39,6 +39,14 @@ export const Navigation = () => {
             >
               Engagement Tools
             </Link>
+            <Link 
+              to="/about" 
+              className={`text-sm font-medium transition-colors hover:text-primary ${
+                isActive("/about") ? "text-primary" : "text-muted-foreground"
+              }`}
+            >
+              About
+            </Link>
           </div>
           
           <Link to="/consulting">
