@@ -34,17 +34,17 @@ const Landing = () => {
             <div className="mt-12 rounded-xl overflow-hidden shadow-2xl border max-w-4xl mx-auto">
               <div className="bg-card p-8">
                 <div className="grid grid-cols-3 gap-4 mb-4">
-                  <div className="h-32 bg-primary/10 rounded-lg flex items-center justify-center">
-                    <span className="text-2xl font-bold text-primary">01</span>
+                  <div className="h-32 bg-primary/10 rounded-lg flex items-center justify-center p-4">
+                    <span className="text-sm font-medium text-primary text-center">Upload Syllabus</span>
                   </div>
-                  <div className="h-32 bg-primary/10 rounded-lg flex items-center justify-center">
-                    <span className="text-2xl font-bold text-primary">02</span>
+                  <div className="h-32 bg-primary/10 rounded-lg flex items-center justify-center p-4">
+                    <span className="text-sm font-medium text-primary text-center">AI Analysis & Recommendations</span>
                   </div>
-                  <div className="h-32 bg-primary/10 rounded-lg flex items-center justify-center">
-                    <span className="text-2xl font-bold text-primary">03</span>
+                  <div className="h-32 bg-primary/10 rounded-lg flex items-center justify-center p-4">
+                    <span className="text-sm font-medium text-primary text-center">Receive Action Plan</span>
                   </div>
                 </div>
-                <div className="text-sm text-muted-foreground">
+                <div className="text-sm text-muted-foreground text-center">
                   AI-powered curriculum restructuring dashboard
                 </div>
               </div>
@@ -61,27 +61,48 @@ const Landing = () => {
                 <CardHeader>
                   <CardTitle>Curriculum Restructuring</CardTitle>
                   <CardDescription>
-                    AI-safe assessments, oral exams, and project rotations to maintain academic integrity
+                    Keep learning outcomes, change assessment formats so AI use is controlled.
                   </CardDescription>
                 </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2 text-sm">
+                    <li>• Convert AI vulnerable work into oral, in class, or artifact based tasks</li>
+                    <li>• Map each week to an AI safe check for understanding</li>
+                    <li>• Produce a short syllabus addendum for students</li>
+                  </ul>
+                </CardContent>
               </Card>
               
               <Card>
                 <CardHeader>
                   <CardTitle>Classroom Engagement</CardTitle>
                   <CardDescription>
-                    Auto-generate quizzes from your readings and keep students actively participating
+                    Make every class session interactive using your own material.
                   </CardDescription>
                 </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2 text-sm">
+                    <li>• Turn PDFs or slides into short quizzes in minutes</li>
+                    <li>• Run live polls to check preparation</li>
+                    <li>• Capture participation data for grading</li>
+                  </ul>
+                </CardContent>
               </Card>
               
               <Card>
                 <CardHeader>
                   <CardTitle>Faculty Enablement</CardTitle>
                   <CardDescription>
-                    AI policy templates and implementation guides tailored to your discipline
+                    Give instructors practical guidance for the AI era.
                   </CardDescription>
                 </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2 text-sm">
+                    <li>• AI use policy templates by discipline</li>
+                    <li>• Examples of assignment wording that reduces AI overuse</li>
+                    <li>• Implementation notes for Canvas, Moodle, or Google Classroom</li>
+                  </ul>
+                </CardContent>
               </Card>
             </div>
           </div>
