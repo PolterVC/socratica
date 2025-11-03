@@ -1,6 +1,5 @@
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 
 const Landing = () => {
@@ -31,21 +30,21 @@ const Landing = () => {
               </Link>
             </div>
             
-            <div className="mt-12 rounded-xl overflow-hidden shadow-2xl border max-w-4xl mx-auto">
-              <div className="bg-card p-8">
-                <div className="grid grid-cols-3 gap-4 mb-4">
-                  <div className="h-32 bg-primary/10 rounded-lg flex items-center justify-center p-4">
-                    <span className="text-sm font-medium text-primary text-center">Upload Syllabus</span>
-                  </div>
-                  <div className="h-32 bg-primary/10 rounded-lg flex items-center justify-center p-4">
-                    <span className="text-sm font-medium text-primary text-center">AI Analysis & Recommendations</span>
-                  </div>
-                  <div className="h-32 bg-primary/10 rounded-lg flex items-center justify-center p-4">
-                    <span className="text-sm font-medium text-primary text-center">Receive Action Plan</span>
-                  </div>
+            <div className="mt-16 max-w-4xl mx-auto">
+              <div className="flex items-center justify-center gap-8 text-center">
+                <div className="flex-1">
+                  <div className="text-2xl font-bold text-primary mb-2">1</div>
+                  <p className="text-sm font-medium">Upload Syllabus</p>
                 </div>
-                <div className="text-sm text-muted-foreground text-center">
-                  AI-powered curriculum restructuring dashboard
+                <div className="text-muted-foreground">→</div>
+                <div className="flex-1">
+                  <div className="text-2xl font-bold text-primary mb-2">2</div>
+                  <p className="text-sm font-medium">AI Analysis & Recommendations</p>
+                </div>
+                <div className="text-muted-foreground">→</div>
+                <div className="flex-1">
+                  <div className="text-2xl font-bold text-primary mb-2">3</div>
+                  <p className="text-sm font-medium">Receive Action Plan</p>
                 </div>
               </div>
             </div>
@@ -55,174 +54,130 @@ const Landing = () => {
         {/* What We Do */}
         <section className="py-20 px-4">
           <div className="container mx-auto max-w-6xl">
-            <h2 className="text-3xl font-bold text-center mb-12">What we do</h2>
-            <div className="grid md:grid-cols-3 gap-8">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Curriculum Restructuring</CardTitle>
-                  <CardDescription>
-                    Keep learning outcomes, change assessment formats so AI use is controlled.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2 text-sm">
-                    <li>• Convert AI vulnerable work into oral, in class, or artifact based tasks</li>
-                    <li>• Map each week to an AI safe check for understanding</li>
-                    <li>• Produce a short syllabus addendum for students</li>
-                  </ul>
-                </CardContent>
-              </Card>
+            <h2 className="text-3xl font-bold text-center mb-16">What we do</h2>
+            <div className="grid md:grid-cols-3 gap-16">
+              <div>
+                <h3 className="text-xl font-bold mb-3">Curriculum Restructuring</h3>
+                <p className="text-muted-foreground mb-4">
+                  Keep learning outcomes, change assessment formats so AI use is controlled.
+                </p>
+                <ul className="space-y-2 text-sm">
+                  <li>• Convert AI vulnerable work into oral, in class, or artifact based tasks</li>
+                  <li>• Map each week to an AI safe check for understanding</li>
+                  <li>• Produce a short syllabus addendum for students</li>
+                </ul>
+              </div>
               
-              <Card>
-                <CardHeader>
-                  <CardTitle>Classroom Engagement</CardTitle>
-                  <CardDescription>
-                    Make every class session interactive using your own material.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2 text-sm">
-                    <li>• Turn PDFs or slides into short quizzes in minutes</li>
-                    <li>• Run live polls to check preparation</li>
-                    <li>• Capture participation data for grading</li>
-                  </ul>
-                </CardContent>
-              </Card>
+              <div>
+                <h3 className="text-xl font-bold mb-3">Classroom Engagement</h3>
+                <p className="text-muted-foreground mb-4">
+                  Make every class session interactive using your own material.
+                </p>
+                <ul className="space-y-2 text-sm">
+                  <li>• Turn PDFs or slides into short quizzes in minutes</li>
+                  <li>• Run live polls to check preparation</li>
+                  <li>• Capture participation data for grading</li>
+                </ul>
+              </div>
               
-              <Card>
-                <CardHeader>
-                  <CardTitle>Faculty Enablement</CardTitle>
-                  <CardDescription>
-                    Give instructors practical guidance for the AI era.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2 text-sm">
-                    <li>• AI use policy templates by discipline</li>
-                    <li>• Examples of assignment wording that reduces AI overuse</li>
-                    <li>• Implementation notes for Canvas, Moodle, or Google Classroom</li>
-                  </ul>
-                </CardContent>
-              </Card>
+              <div>
+                <h3 className="text-xl font-bold mb-3">Faculty Enablement</h3>
+                <p className="text-muted-foreground mb-4">
+                  Give instructors practical guidance for the AI era.
+                </p>
+                <ul className="space-y-2 text-sm">
+                  <li>• AI use policy templates by discipline</li>
+                  <li>• Examples of assignment wording that reduces AI overuse</li>
+                  <li>• Implementation notes for Canvas, Moodle, or Google Classroom</li>
+                </ul>
+              </div>
             </div>
           </div>
         </section>
         
         {/* Who It's For */}
-        <section className="py-20 px-4 bg-secondary/30">
+        <section className="py-20 px-4 border-t">
           <div className="container mx-auto max-w-6xl">
             <h2 className="text-3xl font-bold text-center mb-12">Who it's for</h2>
-            <div className="flex flex-wrap gap-4 justify-center">
+            <div className="flex flex-wrap gap-6 justify-center text-lg">
               {["Business", "Humanities", "Social Science", "Professional Programs", "Law & Policy"].map((tag) => (
-                <div key={tag} className="px-6 py-3 bg-primary/10 text-primary rounded-full font-medium">
+                <span key={tag} className="text-muted-foreground">
                   {tag}
-                </div>
+                </span>
               ))}
             </div>
           </div>
         </section>
         
         {/* Example Outcomes */}
-        <section className="py-20 px-4">
+        <section className="py-20 px-4 border-t">
           <div className="container mx-auto max-w-6xl">
             <h2 className="text-3xl font-bold text-center mb-12">Example outcomes</h2>
-            <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-              <Card>
-                <CardContent className="pt-6">
-                  <p>Replace generic essays with oral or in-class defenses</p>
-                </CardContent>
-              </Card>
+            <div className="grid md:grid-cols-2 gap-x-16 gap-y-6 max-w-4xl mx-auto">
+              <div className="border-l-2 border-primary pl-4">
+                <p>Replace generic essays with oral or in-class defenses</p>
+              </div>
               
-              <Card>
-                <CardContent className="pt-6">
-                  <p>Add AI policy to syllabus with clear guidelines</p>
-                </CardContent>
-              </Card>
+              <div className="border-l-2 border-primary pl-4">
+                <p>Add AI policy to syllabus with clear guidelines</p>
+              </div>
               
-              <Card>
-                <CardContent className="pt-6">
-                  <p>Add auto MC and short response checks to every class</p>
-                </CardContent>
-              </Card>
+              <div className="border-l-2 border-primary pl-4">
+                <p>Add auto MC and short response checks to every class</p>
+              </div>
               
-              <Card>
-                <CardContent className="pt-6">
-                  <p>Rotate quiz banks and implement authentic assessments</p>
-                </CardContent>
-              </Card>
+              <div className="border-l-2 border-primary pl-4">
+                <p>Rotate quiz banks and implement authentic assessments</p>
+              </div>
             </div>
           </div>
         </section>
         
         {/* About Us */}
-        <section className="py-20 px-4 bg-secondary/30">
+        <section className="py-20 px-4 border-t">
           <div className="container mx-auto max-w-6xl">
             <h2 className="text-3xl font-bold text-center mb-8">About us</h2>
-            <p className="text-center text-lg text-muted-foreground mb-12 max-w-3xl mx-auto">
+            <p className="text-center text-lg text-muted-foreground mb-16 max-w-3xl mx-auto">
               We are a team of 5 McGill students dedicated to helping teachers catch up to AI. We built LiveQuiz to help Professors at McGill and the University of Montreal bring critical thinking back into education.
             </p>
             
-            <h3 className="text-2xl font-bold text-center mb-8">Our team</h3>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-xl">Megan Curadeau</CardTitle>
-                  <CardDescription>CEO</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm">A fierce marketer</p>
-                </CardContent>
-              </Card>
+            <h3 className="text-2xl font-bold text-center mb-12">Our team</h3>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-8 max-w-5xl mx-auto">
+              <div>
+                <h4 className="font-bold">Megan Curadeau</h4>
+                <p className="text-sm text-muted-foreground mb-2">CEO</p>
+                <p className="text-sm">A fierce marketer</p>
+              </div>
               
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-xl">Helena Ristanovic Clifford</CardTitle>
-                  <CardDescription>CTO</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm">Tech mogul bringing founder experience</p>
-                </CardContent>
-              </Card>
+              <div>
+                <h4 className="font-bold">Helena Ristanovic Clifford</h4>
+                <p className="text-sm text-muted-foreground mb-2">CTO</p>
+                <p className="text-sm">Tech mogul bringing founder experience</p>
+              </div>
               
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-xl">Christine Wu</CardTitle>
-                  <CardDescription>COO</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm">Ex-founder and venture expert</p>
-                </CardContent>
-              </Card>
+              <div>
+                <h4 className="font-bold">Christine Wu</h4>
+                <p className="text-sm text-muted-foreground mb-2">COO</p>
+                <p className="text-sm">Ex-founder and venture expert</p>
+              </div>
               
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-xl">Ashley Li</CardTitle>
-                  <CardDescription>CMO</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm">Political thought leader turned entrepreneur</p>
-                </CardContent>
-              </Card>
+              <div>
+                <h4 className="font-bold">Ashley Li</h4>
+                <p className="text-sm text-muted-foreground mb-2">CMO</p>
+                <p className="text-sm">Political thought leader turned entrepreneur</p>
+              </div>
               
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-xl">Eli Polterovich</CardTitle>
-                  <CardDescription>CRO</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm">Previously built ventures in Edtech</p>
-                </CardContent>
-              </Card>
+              <div>
+                <h4 className="font-bold">Eli Polterovich</h4>
+                <p className="text-sm text-muted-foreground mb-2">CRO</p>
+                <p className="text-sm">Previously built ventures in Edtech</p>
+              </div>
               
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-xl">Various Advisors & Experts</CardTitle>
-                  <CardDescription>Collaboration</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm">In collaboration with the education faculty at McGill</p>
-                </CardContent>
-              </Card>
+              <div>
+                <h4 className="font-bold">Various Advisors & Experts</h4>
+                <p className="text-sm text-muted-foreground mb-2">Collaboration</p>
+                <p className="text-sm">In collaboration with the education faculty at McGill</p>
+              </div>
             </div>
           </div>
         </section>
