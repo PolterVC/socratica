@@ -22,6 +22,7 @@ interface ConsultingPlan {
 
 const Consulting = () => {
   const { toast } = useToast();
+  const [consultationType, setConsultationType] = useState<"ai" | "human" | null>(null);
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [plan, setPlan] = useState<ConsultingPlan | null>(null);
@@ -39,6 +40,14 @@ const Consulting = () => {
     lms: "",
     difficulty: "",
     goals: [] as string[],
+  });
+
+  const [contactData, setContactData] = useState({
+    name: "",
+    email: "",
+    institution: "",
+    courseTitle: "",
+    message: "",
   });
 
   const disciplines = [
@@ -164,6 +173,24 @@ ${plan.lmsIntegration}
     URL.revokeObjectURL(url);
   };
 
+  const handleContactSubmit = async () => {
+    if (!contactData.name || !contactData.email || !contactData.institution) {
+      toast({
+        title: "Missing information",
+        description: "Please fill in all required fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
+    toast({
+      title: "Request submitted!",
+      description: "We'll get back to you within 24 hours to schedule your consultation.",
+    });
+    setLoading(false);
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navigation />
@@ -173,14 +200,121 @@ ${plan.lmsIntegration}
           <div className="mb-8">
             <h1 className="text-4xl font-bold mb-2">AI Consulting Dashboard</h1>
             <p className="text-muted-foreground">
-              Answer a few questions about your course, and we'll generate a concrete plan to adapt to the AI era.
+              Get instant AI-generated restructuring plans or book a personalized consultation with our team of experts.
             </p>
           </div>
 
           <div className="grid lg:grid-cols-2 gap-8">
             {/* Form Section */}
             <div className="space-y-6">
-              {step === 1 && (
+              {!consultationType && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Choose Your Consultation Type</CardTitle>
+                    <CardDescription>Select how you'd like to proceed</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <Button 
+                      onClick={() => setConsultationType("ai")} 
+                      className="w-full h-auto py-6 flex flex-col items-start"
+                      variant="outline"
+                    >
+                      <span className="font-semibold text-lg mb-2">AI Structure</span>
+                      <span className="text-sm text-muted-foreground text-left font-normal">
+                        Get an instant AI-generated course restructuring plan
+                      </span>
+                    </Button>
+                    <Button 
+                      onClick={() => setConsultationType("human")} 
+                      className="w-full h-auto py-6 flex flex-col items-start"
+                      variant="outline"
+                    >
+                      <span className="font-semibold text-lg mb-2">Book a Meeting</span>
+                      <span className="text-sm text-muted-foreground text-left font-normal">
+                        Schedule a consultation with our team of experts
+                      </span>
+                    </Button>
+                  </CardContent>
+                </Card>
+              )}
+
+              {consultationType === "human" && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Book a Consultation</CardTitle>
+                    <CardDescription>Fill out your information and we'll get back to you</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div>
+                      <Label htmlFor="name">Name *</Label>
+                      <Input
+                        id="name"
+                        value={contactData.name}
+                        onChange={(e) => setContactData({ ...contactData, name: e.target.value })}
+                        placeholder="Your full name"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="email">Email *</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={contactData.email}
+                        onChange={(e) => setContactData({ ...contactData, email: e.target.value })}
+                        placeholder="your.email@university.edu"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="institution">Institution *</Label>
+                      <Input
+                        id="institution"
+                        value={contactData.institution}
+                        onChange={(e) => setContactData({ ...contactData, institution: e.target.value })}
+                        placeholder="e.g., McGill University"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="contactCourseTitle">Course Title</Label>
+                      <Input
+                        id="contactCourseTitle"
+                        value={contactData.courseTitle}
+                        onChange={(e) => setContactData({ ...contactData, courseTitle: e.target.value })}
+                        placeholder="e.g., Introduction to Business Strategy"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="message">Tell us about your needs</Label>
+                      <Textarea
+                        id="message"
+                        value={contactData.message}
+                        onChange={(e) => setContactData({ ...contactData, message: e.target.value })}
+                        placeholder="What challenges are you facing with AI in your course?"
+                        rows={4}
+                      />
+                    </div>
+
+                    <div className="flex gap-2">
+                      <Button onClick={() => setConsultationType(null)} variant="outline" className="w-full">
+                        Back
+                      </Button>
+                      <Button 
+                        onClick={handleContactSubmit} 
+                        disabled={loading || !contactData.name || !contactData.email || !contactData.institution}
+                        className="w-full"
+                      >
+                        {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        Submit Request
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {consultationType === "ai" && step === 1 && (
                 <Card>
                   <CardHeader>
                     <CardTitle>Step 1: Course Basics</CardTitle>
@@ -236,12 +370,17 @@ ${plan.lmsIntegration}
                       </Select>
                     </div>
 
-                    <Button onClick={() => setStep(2)} className="w-full">Next</Button>
+                    <div className="flex gap-2">
+                      <Button onClick={() => setConsultationType(null)} variant="outline" className="w-full">
+                        Back
+                      </Button>
+                      <Button onClick={() => setStep(2)} className="w-full">Next</Button>
+                    </div>
                   </CardContent>
                 </Card>
               )}
 
-              {step === 2 && (
+              {consultationType === "ai" && step === 2 && (
                 <Card>
                   <CardHeader>
                     <CardTitle>Step 2: Current Assessments</CardTitle>
@@ -301,7 +440,7 @@ ${plan.lmsIntegration}
                 </Card>
               )}
 
-              {step === 3 && (
+              {consultationType === "ai" && step === 3 && (
                 <Card>
                   <CardHeader>
                     <CardTitle>Step 3: Constraints</CardTitle>
@@ -381,7 +520,7 @@ ${plan.lmsIntegration}
                 </Card>
               )}
 
-              {step === 4 && (
+              {consultationType === "ai" && step === 4 && (
                 <Card>
                   <CardHeader>
                     <CardTitle>Step 4: Goals</CardTitle>
@@ -424,13 +563,58 @@ ${plan.lmsIntegration}
             <div>
               <Card className="sticky top-20">
                 <CardHeader>
-                  <CardTitle>Recommended Structure</CardTitle>
+                  <CardTitle>
+                    {consultationType === "human" ? "Next Steps" : "Recommended Structure"}
+                  </CardTitle>
                   <CardDescription>
-                    {plan ? "Your AI-resilient course plan" : "Fill out the form to see your personalized plan"}
+                    {consultationType === "human" 
+                      ? "What happens after you submit your request"
+                      : plan 
+                        ? "Your AI-resilient course plan" 
+                        : "Fill out the form to see your personalized plan"}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {loading ? (
+                  {consultationType === "human" ? (
+                    <div className="space-y-4 text-sm">
+                      <div className="flex items-start gap-3">
+                        <div className="rounded-full bg-primary/10 p-2 mt-1">
+                          <span className="text-primary font-bold">1</span>
+                        </div>
+                        <div>
+                          <p className="font-medium mb-1">We'll Review Your Request</p>
+                          <p className="text-muted-foreground">Our team will review your information within 24 hours.</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <div className="rounded-full bg-primary/10 p-2 mt-1">
+                          <span className="text-primary font-bold">2</span>
+                        </div>
+                        <div>
+                          <p className="font-medium mb-1">Schedule Your Meeting</p>
+                          <p className="text-muted-foreground">We'll send you available times for a 45-minute consultation.</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <div className="rounded-full bg-primary/10 p-2 mt-1">
+                          <span className="text-primary font-bold">3</span>
+                        </div>
+                        <div>
+                          <p className="font-medium mb-1">Get Personalized Guidance</p>
+                          <p className="text-muted-foreground">Work with our experts to develop a tailored plan for your course.</p>
+                        </div>
+                      </div>
+                      <div className="mt-6 p-4 bg-primary/5 rounded-lg">
+                        <p className="text-sm font-medium mb-2">What to expect in your consultation:</p>
+                        <ul className="space-y-1 text-sm text-muted-foreground">
+                          <li>• Detailed analysis of your current curriculum</li>
+                          <li>• AI-resistant assessment strategies</li>
+                          <li>• Implementation roadmap</li>
+                          <li>• Ongoing support options</li>
+                        </ul>
+                      </div>
+                    </div>
+                  ) : loading ? (
                     <div className="flex items-center justify-center py-12">
                       <Loader2 className="h-8 w-8 animate-spin text-primary" />
                     </div>
@@ -488,7 +672,11 @@ ${plan.lmsIntegration}
                     </div>
                   ) : (
                     <div className="text-center py-12 text-muted-foreground">
-                      <p className="text-sm">Your course restructuring plan will appear here</p>
+                      <p className="text-sm">
+                        {!consultationType 
+                          ? "Choose a consultation type to get started" 
+                          : "Your course restructuring plan will appear here"}
+                      </p>
                     </div>
                   )}
                 </CardContent>
