@@ -192,6 +192,16 @@ const Landing = () => {
                   <p className="text-sm">Previously built ventures in Edtech</p>
                 </CardContent>
               </Card>
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-xl">Various Advisors & Experts</CardTitle>
+                  <CardDescription>Collaboration</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm">In collaboration with the education faculty at McGill</p>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </section>
