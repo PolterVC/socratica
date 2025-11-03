@@ -133,6 +133,69 @@ const Landing = () => {
           </div>
         </section>
         
+        {/* About Us */}
+        <section className="py-20 px-4 bg-secondary/30">
+          <div className="container mx-auto max-w-6xl">
+            <h2 className="text-3xl font-bold text-center mb-8">About us</h2>
+            <p className="text-center text-lg text-muted-foreground mb-12 max-w-3xl mx-auto">
+              We are a team of 5 McGill students dedicated to helping teachers catch up to AI. We built LiveQuiz to help Professors at McGill and the University of Montreal bring critical thinking back into education.
+            </p>
+            
+            <h3 className="text-2xl font-bold text-center mb-8">Our team</h3>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-xl">Megan Curadeau</CardTitle>
+                  <CardDescription>CEO</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm">A fierce marketer</p>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-xl">Helena Ristanovic Clifford</CardTitle>
+                  <CardDescription>CTO</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm">Tech mogul bringing founder experience</p>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-xl">Christine Wu</CardTitle>
+                  <CardDescription>COO</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm">Ex-founder and venture expert</p>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-xl">Ashley Li</CardTitle>
+                  <CardDescription>CMO</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm">Political thought leader turned entrepreneur</p>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-xl">Eli Polterovich</CardTitle>
+                  <CardDescription>CRO</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm">Previously built ventures in Edtech</p>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
+        
         {/* CTA Section */}
         <section className="py-20 px-4 bg-primary text-primary-foreground">
           <div className="container mx-auto max-w-4xl text-center">
