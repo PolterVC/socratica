@@ -1,10 +1,8 @@
 import { Navigation } from "@/components/Navigation";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-
 const Landing = () => {
-  return (
-    <div className="min-h-screen flex flex-col">
+  return <div className="min-h-screen flex flex-col">
       <Navigation />
       
       <main className="flex-1">
@@ -100,38 +98,15 @@ const Landing = () => {
           <div className="container mx-auto max-w-6xl">
             <h2 className="text-3xl font-bold text-center mb-12">Who it's for</h2>
             <div className="flex flex-wrap gap-6 justify-center text-lg">
-              {["Business", "Humanities", "Social Science", "Professional Programs", "Law & Policy"].map((tag) => (
-                <span key={tag} className="text-muted-foreground">
+              {["Business", "Humanities", "Social Science", "Professional Programs", "Law & Policy"].map(tag => <span key={tag} className="text-muted-foreground">
                   {tag}
-                </span>
-              ))}
+                </span>)}
             </div>
           </div>
         </section>
         
         {/* Example Outcomes */}
-        <section className="py-20 px-4 border-t">
-          <div className="container mx-auto max-w-6xl">
-            <h2 className="text-3xl font-bold text-center mb-12">Example outcomes</h2>
-            <div className="grid md:grid-cols-2 gap-x-16 gap-y-6 max-w-4xl mx-auto">
-              <div className="border-l-2 border-primary pl-4">
-                <p>Replace generic essays with oral or in-class defenses</p>
-              </div>
-              
-              <div className="border-l-2 border-primary pl-4">
-                <p>Add AI policy to syllabus with clear guidelines</p>
-              </div>
-              
-              <div className="border-l-2 border-primary pl-4">
-                <p>Add auto MC and short response checks to every class</p>
-              </div>
-              
-              <div className="border-l-2 border-primary pl-4">
-                <p>Rotate quiz banks and implement authentic assessments</p>
-              </div>
-            </div>
-          </div>
-        </section>
+        
         
         {/* About Us */}
         <section className="py-20 px-4 border-t">
@@ -222,8 +197,6 @@ const Landing = () => {
           </div>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 };
-
 export default Landing;
