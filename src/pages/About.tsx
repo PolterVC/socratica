@@ -50,7 +50,6 @@ const About = () => {
                 
                 <div>
                   <h3 className="text-xl font-bold">Various Advisors & Experts</h3>
-                  <p className="text-sm text-primary mb-2">Collaboration</p>
                   <p className="text-muted-foreground">In collaboration with the education faculty at McGill University.</p>
                 </div>
               </div>
