@@ -13,7 +13,7 @@ export const Navigation = () => {
         <div className="flex h-16 items-center justify-between">
           <Link to="/" className="flex items-center gap-2 font-semibold text-xl">
             <GraduationCap className="h-6 w-6 text-primary" />
-            <span>Course<span className="text-primary">AI</span></span>
+            <span>LiveQuiz</span>
           </Link>
           
           <div className="hidden md:flex items-center gap-6">

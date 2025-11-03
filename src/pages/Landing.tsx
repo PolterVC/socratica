@@ -177,7 +177,7 @@ const Landing = () => {
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="flex items-center gap-2 font-semibold">
               <GraduationCap className="h-5 w-5 text-primary" />
-              <span>CourseAI</span>
+              <span>LiveQuiz</span>
             </div>
             <div className="flex gap-6">
               <Link to="/consulting" className="text-sm text-muted-foreground hover:text-primary">
