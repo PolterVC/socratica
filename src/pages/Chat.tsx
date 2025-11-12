@@ -146,7 +146,7 @@ const Chat = () => {
       conversation_id: conversationId,
       sender: "student",
       text: userMessage,
-      question_number: questionNumber ? Number(questionNumber) : null,
+      question_number: questionNumber && questionNumber !== "none" ? Number(questionNumber) : null,
     });
 
     if (insertError) {
@@ -162,7 +162,7 @@ const Chat = () => {
         body: {
           message: userMessage,
           conversationId,
-          questionNumber: questionNumber ? Number(questionNumber) : null,
+          questionNumber: questionNumber && questionNumber !== "none" ? Number(questionNumber) : null,
           allowDirectAnswers:
             conversationInfo?.assignment?.allow_direct_answers ?? false,
         },
@@ -275,7 +275,7 @@ const Chat = () => {
                 <SelectValue placeholder="Q#" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">None</SelectItem>
+                <SelectItem value="none">None</SelectItem>
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
                   <SelectItem key={n} value={n.toString()}>
                     Q{n}
