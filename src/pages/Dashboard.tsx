@@ -52,15 +52,11 @@ const Dashboard = () => {
   }, [navigate]);
 
   const handleSignOut = async () => {
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-      toast.success("Signed out successfully");
-    } catch (error) {
-      console.error('Sign out error:', error);
-      toast.error("Error signing out");
-    }
-    // Don't navigate here - let the auth state listener handle it
+    // Clear the session regardless of signOut success/failure
+    await supabase.auth.signOut({ scope: 'local' });
+    
+    // Force navigation to auth page
+    window.location.href = '/auth';
   };
 
   if (loading) {
