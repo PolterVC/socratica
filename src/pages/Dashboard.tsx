@@ -51,11 +51,11 @@ const Dashboard = () => {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
-  const handleSignOut = async () => {
-    // Clear the session regardless of signOut success/failure
-    await supabase.auth.signOut({ scope: 'local' });
+  const handleSignOut = () => {
+    // Clear all Supabase auth data from localStorage
+    localStorage.removeItem('sb-vzmdaszpvfxvqevkhrvd-auth-token');
     
-    // Force navigation to auth page
+    // Force full page reload to /auth to reset all state
     window.location.href = '/auth';
   };
 
