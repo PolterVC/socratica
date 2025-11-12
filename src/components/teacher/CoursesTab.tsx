@@ -48,11 +48,13 @@ const CoursesTab = ({ userId }: { userId: string }) => {
   }, []);
 
   const loadData = async () => {
-    const { data: coursesData } = await supabase
+    const { data: coursesData, error: coursesError } = await supabase
       .from('courses')
       .select('*')
       .eq('teacher_id', userId)
       .order('created_at', { ascending: false });
+
+    console.log('Courses query:', { coursesData, coursesError, userId });
 
     const { data: assignmentsData } = await supabase
       .from('assignments')
@@ -65,12 +67,16 @@ const CoursesTab = ({ userId }: { userId: string }) => {
 
   const createCourse = async (e: React.FormEvent) => {
     e.preventDefault();
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('courses')
-      .insert({ title: courseTitle, code: courseCode, teacher_id: userId });
+      .insert({ title: courseTitle, code: courseCode, teacher_id: userId })
+      .select();
+
+    console.log('Create course result:', { data, error });
 
     if (error) {
       toast.error('Error creating course');
+      console.error('Course creation error:', error);
     } else {
       toast.success('Course created successfully');
       setShowCourseDialog(false);
