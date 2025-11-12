@@ -5,3 +5,6 @@ verify_jwt = true
 
 [functions.analytics]
 verify_jwt = true
+
+[functions.join-course]
+verify_jwt = true

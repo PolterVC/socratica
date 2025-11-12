@@ -67,54 +67,26 @@ const StudentDashboard = ({ user }: StudentDashboardProps) => {
 
   const joinCourse = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!joinCode.trim()) return;
+    if (!joinCode.trim() || !user) return;
 
-    // Normalize: trim and convert to lowercase
-    const normalizedCode = joinCode.trim().toLowerCase();
+    // Match DB format: trim, uppercase
+    const normalizedCode = joinCode.trim().toUpperCase();
 
-    // Find course by join code
-    const { data: course, error: courseError } = await supabase
-      .from('courses')
-      .select('id, title, code')
-      .eq('join_code', normalizedCode)
-      .maybeSingle();
+    // Call edge function so RLS does not block us
+    const { data, error } = await supabase.functions.invoke('join-course', {
+      body: { joinCode: normalizedCode },
+    });
 
-    if (courseError || !course) {
+    if (error || !data || data.error) {
+      console.error('Join error:', error || data?.error);
       toast.error('Invalid join code');
       return;
     }
 
-    // Check if already enrolled
-    const { data: existing } = await supabase
-      .from('enrollments')
-      .select('id')
-      .eq('student_id', user.id)
-      .eq('course_id', course.id)
-      .maybeSingle();
-
-    if (existing) {
-      toast.success('You are already enrolled in this course');
-      setJoinCode("");
-      loadData();
-      return;
-    }
-
-    // Create enrollment
-    const { error: enrollError } = await supabase
-      .from('enrollments')
-      .insert({
-        student_id: user.id,
-        course_id: course.id
-      });
-
-    if (enrollError) {
-      console.error('Enrollment error:', enrollError);
-      toast.error('Error joining course');
-    } else {
-      toast.success(`Successfully joined ${course.code}!`);
-      setJoinCode("");
-      loadData();
-    }
+    toast.success(`Successfully joined ${data.course.code}!`);
+    setJoinCode("");
+    // Reload enrolled courses and assignments
+    await loadData();
   };
 
   const startChat = async (assignmentId: string, courseId: string) => {
