@@ -183,10 +183,10 @@ const Chat = () => {
           text: data.tutor_reply,
           question_number: data.metadata?.question_number ?? null,
           topic_tag: data.metadata?.topic_tag ?? null,
-          confusion_flag: data.metadata?.confusion_flag ?? null,
+          confusion_flag: data.metadata?.confusion_flag ?? false,
         });
       } else {
-        toast.error("Tutor did not return a reply");
+        toast.error(data?.error ?? "Tutor did not respond");
       }
     } catch (err) {
       console.error(err);
