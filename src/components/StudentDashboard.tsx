@@ -38,18 +38,30 @@ const StudentDashboard = ({ user }: StudentDashboardProps) => {
   }, []);
 
   const loadData = async () => {
-    const { data: coursesData } = await supabase
-      .from('courses')
-      .select('*')
-      .order('created_at', { ascending: false });
+    // Fetch enrolled courses
+    const { data: enrollmentsData } = await supabase
+      .from('enrollments')
+      .select('course_id, courses(*)')
+      .eq('student_id', user.id);
 
-    const { data: assignmentsData } = await supabase
-      .from('assignments')
-      .select('*')
-      .order('created_at', { ascending: false });
+    const enrolledCourses = enrollmentsData?.map(e => e.courses).filter(Boolean) || [];
+    const enrolledCourseIds = enrolledCourses.map(c => c.id);
 
-    setCourses(coursesData || []);
-    setAssignments(assignmentsData || []);
+    setCourses(enrolledCourses as Course[]);
+
+    // Fetch assignments only from enrolled courses
+    if (enrolledCourseIds.length > 0) {
+      const { data: assignmentsData } = await supabase
+        .from('assignments')
+        .select('*')
+        .in('course_id', enrolledCourseIds)
+        .order('created_at', { ascending: false });
+
+      setAssignments(assignmentsData || []);
+    } else {
+      setAssignments([]);
+    }
+
     setLoading(false);
   };
 
@@ -57,11 +69,14 @@ const StudentDashboard = ({ user }: StudentDashboardProps) => {
     e.preventDefault();
     if (!joinCode.trim()) return;
 
+    // Normalize: trim and convert to lowercase
+    const normalizedCode = joinCode.trim().toLowerCase();
+
     // Find course by join code
     const { data: course, error: courseError } = await supabase
       .from('courses')
-      .select('id')
-      .eq('join_code', joinCode.trim().toUpperCase())
+      .select('id, title, code')
+      .eq('join_code', normalizedCode)
       .maybeSingle();
 
     if (courseError || !course) {
@@ -78,7 +93,9 @@ const StudentDashboard = ({ user }: StudentDashboardProps) => {
       .maybeSingle();
 
     if (existing) {
-      toast.error('You are already enrolled in this course');
+      toast.success('You are already enrolled in this course');
+      setJoinCode("");
+      loadData();
       return;
     }
 
@@ -91,9 +108,10 @@ const StudentDashboard = ({ user }: StudentDashboardProps) => {
       });
 
     if (enrollError) {
+      console.error('Enrollment error:', enrollError);
       toast.error('Error joining course');
     } else {
-      toast.success('Successfully joined course!');
+      toast.success(`Successfully joined ${course.code}!`);
       setJoinCode("");
       loadData();
     }
@@ -154,7 +172,7 @@ const StudentDashboard = ({ user }: StudentDashboardProps) => {
           <form onSubmit={joinCourse} className="flex gap-2">
             <Input
               value={joinCode}
-              onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
+              onChange={(e) => setJoinCode(e.target.value)}
               placeholder="Enter join code"
               className="flex-1"
             />
