@@ -14,16 +14,205 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      assignments: {
+        Row: {
+          allow_direct_answers: boolean | null
+          course_id: string
+          created_at: string | null
+          description: string | null
+          due_date: string | null
+          id: string
+          title: string
+        }
+        Insert: {
+          allow_direct_answers?: boolean | null
+          course_id: string
+          created_at?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          title: string
+        }
+        Update: {
+          allow_direct_answers?: boolean | null
+          course_id?: string
+          created_at?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "assignments_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      conversations: {
+        Row: {
+          assignment_id: string
+          course_id: string
+          created_at: string | null
+          id: string
+          student_id: string
+        }
+        Insert: {
+          assignment_id: string
+          course_id: string
+          created_at?: string | null
+          id?: string
+          student_id: string
+        }
+        Update: {
+          assignment_id?: string
+          course_id?: string
+          created_at?: string | null
+          id?: string
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversations_assignment_id_fkey"
+            columns: ["assignment_id"]
+            isOneToOne: false
+            referencedRelation: "assignments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversations_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      courses: {
+        Row: {
+          code: string
+          created_at: string | null
+          id: string
+          teacher_id: string
+          title: string
+        }
+        Insert: {
+          code: string
+          created_at?: string | null
+          id?: string
+          teacher_id: string
+          title: string
+        }
+        Update: {
+          code?: string
+          created_at?: string | null
+          id?: string
+          teacher_id?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      messages: {
+        Row: {
+          confusion_flag: boolean | null
+          conversation_id: string
+          created_at: string | null
+          id: string
+          question_number: number | null
+          sender: string
+          text: string
+          topic_tag: string | null
+        }
+        Insert: {
+          confusion_flag?: boolean | null
+          conversation_id: string
+          created_at?: string | null
+          id?: string
+          question_number?: number | null
+          sender: string
+          text: string
+          topic_tag?: string | null
+        }
+        Update: {
+          confusion_flag?: boolean | null
+          conversation_id?: string
+          created_at?: string | null
+          id?: string
+          question_number?: number | null
+          sender?: string
+          text?: string
+          topic_tag?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          email: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          id: string
+          name: string
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "student" | "teacher"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +339,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["student", "teacher"],
+    },
   },
 } as const
