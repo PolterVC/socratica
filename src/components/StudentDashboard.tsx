@@ -4,7 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { BookOpen, MessageSquare } from "lucide-react";
+import { toast } from "sonner";
 
 interface Course {
   id: string;
@@ -29,6 +31,7 @@ const StudentDashboard = ({ user }: StudentDashboardProps) => {
   const [courses, setCourses] = useState<Course[]>([]);
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [joinCode, setJoinCode] = useState("");
 
   useEffect(() => {
     loadData();
@@ -48,6 +51,52 @@ const StudentDashboard = ({ user }: StudentDashboardProps) => {
     setCourses(coursesData || []);
     setAssignments(assignmentsData || []);
     setLoading(false);
+  };
+
+  const joinCourse = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!joinCode.trim()) return;
+
+    // Find course by join code
+    const { data: course, error: courseError } = await supabase
+      .from('courses')
+      .select('id')
+      .eq('join_code', joinCode.trim().toUpperCase())
+      .maybeSingle();
+
+    if (courseError || !course) {
+      toast.error('Invalid join code');
+      return;
+    }
+
+    // Check if already enrolled
+    const { data: existing } = await supabase
+      .from('enrollments')
+      .select('id')
+      .eq('student_id', user.id)
+      .eq('course_id', course.id)
+      .maybeSingle();
+
+    if (existing) {
+      toast.error('You are already enrolled in this course');
+      return;
+    }
+
+    // Create enrollment
+    const { error: enrollError } = await supabase
+      .from('enrollments')
+      .insert({
+        student_id: user.id,
+        course_id: course.id
+      });
+
+    if (enrollError) {
+      toast.error('Error joining course');
+    } else {
+      toast.success('Successfully joined course!');
+      setJoinCode("");
+      loadData();
+    }
   };
 
   const startChat = async (assignmentId: string, courseId: string) => {
@@ -76,6 +125,7 @@ const StudentDashboard = ({ user }: StudentDashboardProps) => {
 
       if (error) {
         console.error('Error creating conversation:', error);
+        toast.error('Error starting chat. Make sure you are enrolled in this course.');
       } else {
         navigate(`/chat/${newConv.id}`);
       }
@@ -93,6 +143,28 @@ const StudentDashboard = ({ user }: StudentDashboardProps) => {
         <p className="text-muted-foreground mt-2">
           Select an assignment to start chatting with Socratica
         </p>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Join a Course</CardTitle>
+          <CardDescription>Enter the join code provided by your teacher</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={joinCourse} className="flex gap-2">
+            <Input
+              value={joinCode}
+              onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
+              placeholder="Enter join code"
+              className="flex-1"
+            />
+            <Button type="submit">Join</Button>
+          </form>
+        </CardContent>
+      </Card>
+
+      <div>
+        <h3 className="text-xl font-semibold mb-4">My Courses</h3>
       </div>
 
       {courses.length === 0 ? (

@@ -7,13 +7,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { Plus, BookOpen } from "lucide-react";
+import { Plus, BookOpen, Copy } from "lucide-react";
 import { toast } from "sonner";
 
 interface Course {
   id: string;
   title: string;
   code: string;
+  join_code: string;
 }
 
 interface Assignment {
@@ -165,8 +166,25 @@ const CoursesTab = ({ userId }: { userId: string }) => {
           return (
             <Card key={course.id}>
               <CardHeader>
-                <div className="flex justify-between items-center">
-                  <CardTitle>{course.code} - {course.title}</CardTitle>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <CardTitle>{course.code} - {course.title}</CardTitle>
+                    <div className="flex items-center gap-2 mt-2">
+                      <code className="text-sm bg-muted px-2 py-1 rounded">
+                        Join code: {course.join_code}
+                      </code>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => {
+                          navigator.clipboard.writeText(course.join_code);
+                          toast.success('Join code copied to clipboard');
+                        }}
+                      >
+                        <Copy className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  </div>
                   <Dialog open={showAssignmentDialog && selectedCourse === course.id} onOpenChange={(open) => {
                     setShowAssignmentDialog(open);
                     if (open) setSelectedCourse(course.id);
