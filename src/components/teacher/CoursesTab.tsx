@@ -55,8 +55,6 @@ const CoursesTab = ({ userId }: { userId: string }) => {
         .eq('teacher_id', userId)
         .order('created_at', { ascending: false });
 
-      console.log('Courses query:', { coursesData, coursesError, userId });
-
       if (coursesError) {
         console.error('Error loading courses:', coursesError);
         toast.error('Error loading courses');
@@ -85,8 +83,6 @@ const CoursesTab = ({ userId }: { userId: string }) => {
       .from('courses')
       .insert({ title: courseTitle, code: courseCode, teacher_id: userId })
       .select();
-
-    console.log('Create course result:', { data, error });
 
     if (error) {
       toast.error('Error creating course');
