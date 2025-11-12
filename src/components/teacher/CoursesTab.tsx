@@ -48,21 +48,35 @@ const CoursesTab = ({ userId }: { userId: string }) => {
   }, []);
 
   const loadData = async () => {
-    const { data: coursesData, error: coursesError } = await supabase
-      .from('courses')
-      .select('*')
-      .eq('teacher_id', userId)
-      .order('created_at', { ascending: false });
+    try {
+      const { data: coursesData, error: coursesError } = await supabase
+        .from('courses')
+        .select('*')
+        .eq('teacher_id', userId)
+        .order('created_at', { ascending: false });
 
-    console.log('Courses query:', { coursesData, coursesError, userId });
+      console.log('Courses query:', { coursesData, coursesError, userId });
 
-    const { data: assignmentsData } = await supabase
-      .from('assignments')
-      .select('*')
-      .order('created_at', { ascending: false });
+      if (coursesError) {
+        console.error('Error loading courses:', coursesError);
+        toast.error('Error loading courses');
+      }
 
-    setCourses(coursesData || []);
-    setAssignments(assignmentsData || []);
+      const { data: assignmentsData, error: assignmentsError } = await supabase
+        .from('assignments')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (assignmentsError) {
+        console.error('Error loading assignments:', assignmentsError);
+      }
+
+      setCourses(coursesData || []);
+      setAssignments(assignmentsData || []);
+    } catch (err) {
+      console.error('Unexpected error in loadData:', err);
+      toast.error('Failed to load data');
+    }
   };
 
   const createCourse = async (e: React.FormEvent) => {

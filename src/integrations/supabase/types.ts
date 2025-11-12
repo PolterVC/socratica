@@ -96,7 +96,7 @@ export type Database = {
           code: string
           created_at: string | null
           id: string
-          join_code: string
+          join_code: string | null
           teacher_id: string
           title: string
         }
@@ -104,7 +104,7 @@ export type Database = {
           code: string
           created_at?: string | null
           id?: string
-          join_code?: string
+          join_code?: string | null
           teacher_id: string
           title: string
         }
@@ -112,7 +112,7 @@ export type Database = {
           code?: string
           created_at?: string | null
           id?: string
-          join_code?: string
+          join_code?: string | null
           teacher_id?: string
           title?: string
         }
