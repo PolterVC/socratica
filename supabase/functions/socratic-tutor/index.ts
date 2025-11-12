@@ -131,9 +131,15 @@ Response: {
     }
 
     const aiResponse = await response.json();
-    const content = aiResponse.choices[0].message.content;
+    let content = aiResponse.choices[0].message.content;
     
     console.log('AI response:', content);
+
+    // Strip markdown code blocks if present
+    if (content.startsWith('```')) {
+      // Remove opening ```json or ``` and closing ```
+      content = content.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '').trim();
+    }
 
     // Parse the JSON response
     const parsedResponse = JSON.parse(content);
