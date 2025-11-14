@@ -9,12 +9,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Plus, BookOpen, Copy, UploadCloud, X } from "lucide-react";
 import { toast } from "sonner";
+import MaterialsTab from "./MaterialsTab";
 
 interface Course {
   id: string;
@@ -382,34 +384,50 @@ const CoursesTab = ({ userId }: { userId: string }) => {
                 ) : (
                   <div className="space-y-2">
                     {courseAssignments.map((assignment) => (
-                      <div
-                        key={assignment.id}
-                        className="p-3 border rounded-lg"
-                      >
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <h4 className="font-medium">{assignment.title}</h4>
-                            {assignment.description && (
-                              <p className="text-sm text-muted-foreground mt-1">
-                                {assignment.description}
-                              </p>
+                      <Card key={assignment.id}>
+                        <CardHeader>
+                          <CardTitle className="text-lg flex justify-between items-start">
+                            <span>{assignment.title}</span>
+                            {assignment.allow_direct_answers && (
+                              <span className="text-xs bg-accent text-accent-foreground px-2 py-1 rounded font-normal">
+                                Direct answers allowed
+                              </span>
                             )}
-                            {assignment.due_date && (
-                              <p className="text-xs text-muted-foreground mt-2">
-                                Due:{" "}
-                                {new Date(
-                                  assignment.due_date
-                                ).toLocaleDateString()}
-                              </p>
-                            )}
-                          </div>
-                          {assignment.allow_direct_answers && (
-                            <span className="text-xs bg-accent text-accent-foreground px-2 py-1 rounded">
-                              Direct answers allowed
-                            </span>
+                          </CardTitle>
+                          {assignment.description && (
+                            <p className="text-sm text-muted-foreground">
+                              {assignment.description}
+                            </p>
                           )}
-                        </div>
-                      </div>
+                          {assignment.due_date && (
+                            <p className="text-xs text-muted-foreground">
+                              Due:{" "}
+                              {new Date(
+                                assignment.due_date
+                              ).toLocaleDateString()}
+                            </p>
+                          )}
+                        </CardHeader>
+                        <CardContent>
+                          <Tabs defaultValue="details">
+                            <TabsList>
+                              <TabsTrigger value="details">Details</TabsTrigger>
+                              <TabsTrigger value="materials">Materials</TabsTrigger>
+                            </TabsList>
+                            <TabsContent value="details" className="space-y-2">
+                              <p className="text-sm text-muted-foreground">
+                                Assignment settings and overview
+                              </p>
+                            </TabsContent>
+                            <TabsContent value="materials">
+                              <MaterialsTab
+                                courseId={course.id}
+                                assignmentId={assignment.id}
+                              />
+                            </TabsContent>
+                          </Tabs>
+                        </CardContent>
+                      </Card>
                     ))}
                   </div>
                 )}
