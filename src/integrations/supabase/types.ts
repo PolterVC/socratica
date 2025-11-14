@@ -147,6 +147,92 @@ export type Database = {
           },
         ]
       }
+      material_text: {
+        Row: {
+          chunk_index: number
+          content: string
+          created_at: string | null
+          id: string
+          material_id: string
+          tsv: unknown
+        }
+        Insert: {
+          chunk_index: number
+          content: string
+          created_at?: string | null
+          id?: string
+          material_id: string
+          tsv?: unknown
+        }
+        Update: {
+          chunk_index?: number
+          content?: string
+          created_at?: string | null
+          id?: string
+          material_id?: string
+          tsv?: unknown
+        }
+        Relationships: [
+          {
+            foreignKeyName: "material_text_material_id_fkey"
+            columns: ["material_id"]
+            isOneToOne: false
+            referencedRelation: "materials"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      materials: {
+        Row: {
+          assignment_id: string | null
+          course_id: string
+          created_at: string | null
+          created_by: string
+          id: string
+          kind: string
+          storage_path: string
+          text_extracted: boolean
+          title: string
+        }
+        Insert: {
+          assignment_id?: string | null
+          course_id: string
+          created_at?: string | null
+          created_by: string
+          id?: string
+          kind: string
+          storage_path: string
+          text_extracted?: boolean
+          title: string
+        }
+        Update: {
+          assignment_id?: string | null
+          course_id?: string
+          created_at?: string | null
+          created_by?: string
+          id?: string
+          kind?: string
+          storage_path?: string
+          text_extracted?: boolean
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "materials_assignment_id_fkey"
+            columns: ["assignment_id"]
+            isOneToOne: false
+            referencedRelation: "assignments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "materials_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       messages: {
         Row: {
           confusion_flag: boolean | null

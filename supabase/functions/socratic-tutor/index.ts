@@ -91,11 +91,79 @@ serve(async (req) => {
       content: m.text,
     }));
 
+    // Retrieve relevant material chunks
+    let contextBlock = "";
+    const searchString = `${message} ${assignmentTitle} ${assignmentDescription}`.trim();
+
+    if (searchString) {
+      const { data: relevantChunks } = await supabase
+        .from("material_text")
+        .select(`
+          content,
+          materials!inner(title, kind, assignment_id)
+        `)
+        .eq("materials.course_id", convo.course_id)
+        .or(
+          convo.assignment_id
+            ? `materials.assignment_id.eq.${convo.assignment_id},materials.assignment_id.is.null`
+            : "materials.assignment_id.is.null"
+        )
+        .textSearch("tsv", searchString.replace(/[^\w\s]/g, ""), {
+          type: "websearch",
+          config: "english",
+        })
+        .limit(8);
+
+      if (relevantChunks && relevantChunks.length > 0) {
+        const chunks = relevantChunks.slice(0, 5);
+        const contextParts = chunks.map((chunk: any) => {
+          const mat = chunk.materials;
+          return `[Material: ${mat.title} (${mat.kind})]\n${chunk.content}`;
+        });
+        contextBlock = contextParts.join("\n\n");
+        
+        // Limit to 6000 chars
+        if (contextBlock.length > 6000) {
+          contextBlock = contextBlock.substring(0, 6000) + "...";
+        }
+      } else if (convo.assignment_id) {
+        // Fallback: get first 4 chunks from assignment materials
+        const { data: fallbackChunks } = await supabase
+          .from("material_text")
+          .select(`
+            content,
+            materials!inner(title, kind)
+          `)
+          .eq("materials.assignment_id", convo.assignment_id)
+          .order("chunk_index", { ascending: true })
+          .limit(4);
+
+        if (fallbackChunks && fallbackChunks.length > 0) {
+          const contextParts = fallbackChunks.map((chunk: any) => {
+            const mat = chunk.materials;
+            return `[Material: ${mat.title} (${mat.kind})]\n${chunk.content}`;
+          });
+          contextBlock = contextParts.join("\n\n");
+          
+          if (contextBlock.length > 6000) {
+            contextBlock = contextBlock.substring(0, 6000) + "...";
+          }
+        }
+      }
+    }
+
     const systemPrompt = `
 You are Socratica, a Socratic tutor for students.
 Use the assignment context.
 Assignment title: ${assignmentTitle}
 Assignment description: ${assignmentDescription}
+
+${contextBlock ? `
+Context from teacher PDFs follows. Use it to ground your guidance. If something is not in the context, you may still reason, but prefer the provided material text.
+<<CONTEXT>>
+${contextBlock}
+<<END CONTEXT>>
+` : ""}
 
 Your job is to guide, not to write the assignment.
 If the assignment is graded and direct answers are not allowed, refuse to give the full answer. Explain steps instead.

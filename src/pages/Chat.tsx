@@ -13,6 +13,7 @@ import {
 import { Card } from "@/components/ui/card";
 import { Send, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
+import MaterialsList from "@/components/student/MaterialsList";
 
 interface Message {
   id: string;
@@ -25,8 +26,8 @@ interface Message {
 }
 
 interface ConversationInfo {
-  course: { code: string; title: string };
-  assignment: { title: string; allow_direct_answers: boolean };
+  course: { code: string; title: string; id: string };
+  assignment: { title: string; allow_direct_answers: boolean; id: string };
 }
 
 const Chat = () => {
@@ -74,6 +75,8 @@ const Chat = () => {
       .select(
         `
         id,
+        course_id,
+        assignment_id,
         courses ( code, title ),
         assignments ( title, allow_direct_answers )
       `
@@ -89,8 +92,8 @@ const Chat = () => {
     }
 
     setConversationInfo({
-      course: data.courses as any,
-      assignment: data.assignments as any,
+      course: { ...(data.courses as any), id: data.course_id },
+      assignment: { ...(data.assignments as any), id: data.assignment_id },
     });
   };
 
@@ -298,6 +301,13 @@ const Chat = () => {
         </div>
 
         <div className="w-80 space-y-4">
+          {conversationInfo && (
+            <MaterialsList
+              courseId={conversationInfo.course.id}
+              assignmentId={conversationInfo.assignment.id}
+            />
+          )}
+          
           <Card className="p-4">
             <h2 className="font-semibold mb-2">Tutor rules</h2>
             <p className="text-sm text-muted-foreground mb-2">
