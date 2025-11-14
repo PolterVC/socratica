@@ -332,6 +332,7 @@ export type Database = {
         Args: { _course_id: string; _user_id: string }
         Returns: boolean
       }
+      update_material_text_tsv: { Args: { mat_id: string }; Returns: undefined }
     }
     Enums: {
       app_role: "student" | "teacher"
