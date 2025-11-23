@@ -94,6 +94,7 @@ serve(async (req) => {
     // Retrieve relevant material chunks
     let contextBlock = "";
     let referencedMaterials: Array<{ title: string; kind: string }> = [];
+    let hasAnswerMaterials = false;
     const searchString = `${message} ${assignmentTitle} ${assignmentDescription}`.trim();
 
     if (searchString) {
@@ -119,6 +120,10 @@ serve(async (req) => {
         const chunks = relevantChunks.slice(0, 5);
         const contextParts = chunks.map((chunk: any) => {
           const mat = chunk.materials;
+          // Check if this is answer material
+          if (mat.kind === "answers" || mat.kind === "questions_with_answers") {
+            hasAnswerMaterials = true;
+          }
           return `[Material: ${mat.title} (${mat.kind})]\n${chunk.content}`;
         });
         contextBlock = contextParts.join("\n\n");
@@ -183,6 +188,15 @@ Direct answers allowed: ${assignmentAllows ? "YES" : "NO"}
 ${contextBlock ? `
 CRITICAL - COURSE MATERIALS PROVIDED:
 The teacher has uploaded materials that you MUST reference and use to guide this conversation. Always cite and refer to specific concepts, definitions, examples, or frameworks from these materials. When the student asks about a topic, check if it's covered in the materials below and direct them to those sections.
+
+${hasAnswerMaterials ? `
+IMPORTANT - ANSWER MATERIALS DETECTED:
+Some materials contain answers or solutions (marked as "answers" or "questions_with_answers"). You may use these to verify your guidance is correct, but you must NOT directly copy or reveal the final answers to students unless direct answers are explicitly allowed for this assignment. Instead:
+- Use the answers to understand the correct approach
+- Guide students through the reasoning process that leads to those answers
+- Ask questions that help them discover the solution themselves
+- Only if direct answers are allowed, you may provide more complete explanations
+` : ""}
 
 Materials context:
 ---

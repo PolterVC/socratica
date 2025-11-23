@@ -222,7 +222,9 @@ const MaterialsTab = ({ courseId, assignmentId }: MaterialsTabProps) => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="assignment">Assignment</SelectItem>
+                  <SelectItem value="questions">Questions Only</SelectItem>
+                  <SelectItem value="answers">Answers Only</SelectItem>
+                  <SelectItem value="questions_with_answers">Questions + Answers</SelectItem>
                   <SelectItem value="slides">Slides</SelectItem>
                   <SelectItem value="reading">Reading</SelectItem>
                   <SelectItem value="other">Other</SelectItem>
