@@ -17,6 +17,7 @@ import { Switch } from "@/components/ui/switch";
 import { Plus, BookOpen, Copy, UploadCloud, X } from "lucide-react";
 import { toast } from "sonner";
 import MaterialsTab from "./MaterialsTab";
+import { extractTextFromPDF } from "@/utils/pdfExtractor";
 
 interface Course {
   id: string;
@@ -108,27 +109,106 @@ const CoursesTab = ({ userId }: { userId: string }) => {
     e.preventDefault();
     if (!selectedCourse) return;
 
-    // Fake upload: we just pretend we used this file
-    if (assignmentFile) {
-      console.log("Simulated assignment upload:", assignmentFile.name);
-    }
+    try {
+      // Validate attached file if present
+      if (assignmentFile) {
+        if (assignmentFile.type !== "application/pdf") {
+          toast.error("Assignment file must be a PDF");
+          return;
+        }
+        if (assignmentFile.size > 25 * 1024 * 1024) {
+          toast.error("Assignment file must be less than 25MB");
+          return;
+        }
+      }
 
-    const { error } = await supabase.from("assignments").insert({
-      course_id: selectedCourse,
-      title: assignmentTitle,
-      description: assignmentDescription || null,
-      due_date: assignmentDueDate || null,
-      allow_direct_answers: allowDirectAnswers,
-    });
+      const { data: assignment, error } = await supabase
+        .from("assignments")
+        .insert({
+          course_id: selectedCourse,
+          title: assignmentTitle,
+          description: assignmentDescription || null,
+          due_date: assignmentDueDate || null,
+          allow_direct_answers: allowDirectAnswers,
+        })
+        .select()
+        .single();
 
-    if (error) {
-      toast.error("Error creating assignment");
-    } else {
-      toast.success(
-        assignmentFile
-          ? "Assignment created"
-          : "Assignment created successfully"
-      );
+      if (error || !assignment) {
+        console.error("Assignment creation error:", error);
+        toast.error("Error creating assignment");
+        return;
+      }
+
+      // If a file was attached, upload it as a material linked to this assignment
+      if (assignmentFile) {
+        try {
+          const { data: uploadData, error: uploadError } =
+            await supabase.functions.invoke("materials-upload", {
+              body: {
+                courseId: selectedCourse,
+                assignmentId: assignment.id,
+                filename: assignmentFile.name,
+              },
+            });
+
+          if (uploadError) throw uploadError;
+
+          const uploadResponse = await fetch(uploadData.uploadUrl, {
+            method: "PUT",
+            body: assignmentFile,
+            headers: {
+              "Content-Type": "application/pdf",
+              "x-upsert": "true",
+            },
+          });
+
+          if (!uploadResponse.ok) {
+            throw new Error("Assignment file upload failed");
+          }
+
+          const { data: materialData, error: materialError } =
+            await supabase.functions.invoke("materials", {
+              method: "POST",
+              body: {
+                courseId: selectedCourse,
+                assignmentId: assignment.id,
+                title:
+                  assignmentFile.name.replace(/\.pdf$/i, "") ||
+                  `${assignmentTitle} file`,
+                // Default to questions + answers for files attached at creation
+                kind: "questions_with_answers",
+                storagePath: uploadData.storagePath,
+              },
+            });
+
+          if (materialError) throw materialError;
+
+          const { chunks } = await extractTextFromPDF(assignmentFile);
+
+          const { error: textError } = await supabase.functions.invoke(
+            "materials-text",
+            {
+              body: {
+                materialId: materialData.id,
+                chunks,
+              },
+            }
+          );
+
+          if (textError) throw textError;
+
+          toast.success("Assignment and file uploaded successfully");
+        } catch (fileErr) {
+          console.error("Assignment file upload error:", fileErr);
+          toast.error(
+            "Assignment created, but there was a problem uploading the file"
+          );
+        }
+      } else {
+        toast.success("Assignment created successfully");
+      }
+
       setShowAssignmentDialog(false);
       setAssignmentTitle("");
       setAssignmentDescription("");
@@ -137,6 +217,9 @@ const CoursesTab = ({ userId }: { userId: string }) => {
       setAssignmentFile(null);
       setSelectedCourse(null);
       loadData();
+    } catch (err) {
+      console.error("Unexpected error in createAssignment:", err);
+      toast.error("Error creating assignment");
     }
   };
 
