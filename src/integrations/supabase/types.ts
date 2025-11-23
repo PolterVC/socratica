@@ -188,6 +188,7 @@ export type Database = {
           course_id: string
           created_at: string | null
           created_by: string
+          file_size: number | null
           id: string
           kind: string
           storage_path: string
@@ -199,6 +200,7 @@ export type Database = {
           course_id: string
           created_at?: string | null
           created_by: string
+          file_size?: number | null
           id?: string
           kind: string
           storage_path: string
@@ -210,6 +212,7 @@ export type Database = {
           course_id?: string
           created_at?: string | null
           created_by?: string
+          file_size?: number | null
           id?: string
           kind?: string
           storage_path?: string
