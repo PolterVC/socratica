@@ -23,6 +23,7 @@ interface Message {
   question_number?: number | null;
   topic_tag?: string | null;
   confusion_flag?: boolean | null;
+  materials_referenced?: Array<{ title: string; kind: string }>;
 }
 
 interface ConversationInfo {
@@ -180,14 +181,25 @@ const Chat = () => {
       // expect { tutor_reply, metadata: {...} }
       if (data?.tutor_reply) {
         // 3. store tutor message
-        await supabase.from("messages").insert({
+        const { data: insertedMsg } = await supabase.from("messages").insert({
           conversation_id: conversationId,
           sender: "tutor",
           text: data.tutor_reply,
           question_number: data.metadata?.question_number ?? null,
           topic_tag: data.metadata?.topic_tag ?? null,
           confusion_flag: data.metadata?.confusion_flag ?? false,
-        });
+        }).select().single();
+
+        // Add materials_referenced to local state (not stored in DB)
+        if (insertedMsg && data.metadata?.materials_referenced) {
+          setMessages((prev) => 
+            prev.map((m) => 
+              m.id === insertedMsg.id 
+                ? { ...m, materials_referenced: data.metadata.materials_referenced }
+                : m
+            )
+          );
+        }
       } else {
         toast.error(data?.error ?? "Tutor did not respond");
       }
@@ -242,6 +254,22 @@ const Chat = () => {
                         }`}
                       >
                         <p className="whitespace-pre-wrap leading-relaxed">{message.text}</p>
+                        {message.sender === "tutor" && message.materials_referenced && message.materials_referenced.length > 0 && (
+                          <div className="mt-3 pt-3 border-t border-border/40">
+                            <p className="text-xs font-medium mb-2 opacity-70">Referenced materials:</p>
+                            <div className="flex flex-wrap gap-2">
+                              {message.materials_referenced.map((mat, idx) => (
+                                <span
+                                  key={idx}
+                                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs bg-background/60 border border-border/50"
+                                >
+                                  <span className="opacity-60">{mat.kind}</span>
+                                  <span className="font-medium">{mat.title}</span>
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                     {message.sender === "student" && (
