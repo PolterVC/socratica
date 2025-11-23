@@ -48,15 +48,6 @@ const MaterialsTab = ({ courseId, assignmentId }: MaterialsTabProps) => {
       const params = new URLSearchParams({ courseId });
       if (assignmentId) params.append("assignmentId", assignmentId);
 
-      const { data, error } = await supabase.functions.invoke("materials", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (error) throw error;
-
       const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/materials?${params}`;
       const response = await fetch(url, {
         headers: {
@@ -173,12 +164,6 @@ const MaterialsTab = ({ courseId, assignmentId }: MaterialsTabProps) => {
     if (!confirm("Are you sure you want to delete this material?")) return;
 
     try {
-      const { error } = await supabase.functions.invoke("materials", {
-        method: "DELETE",
-      });
-
-      if (error) throw error;
-
       const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/materials?id=${materialId}`;
       const response = await fetch(url, {
         method: "DELETE",
