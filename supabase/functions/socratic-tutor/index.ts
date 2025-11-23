@@ -93,6 +93,7 @@ serve(async (req) => {
 
     // Retrieve relevant material chunks
     let contextBlock = "";
+    let referencedMaterials: Array<{ title: string; kind: string }> = [];
     const searchString = `${message} ${assignmentTitle} ${assignmentDescription}`.trim();
 
     if (searchString) {
@@ -121,6 +122,16 @@ serve(async (req) => {
           return `[Material: ${mat.title} (${mat.kind})]\n${chunk.content}`;
         });
         contextBlock = contextParts.join("\n\n");
+        
+        // Track unique materials referenced
+        const uniqueMats = new Map();
+        chunks.forEach((chunk: any) => {
+          const mat = chunk.materials;
+          if (!uniqueMats.has(mat.title)) {
+            uniqueMats.set(mat.title, { title: mat.title, kind: mat.kind });
+          }
+        });
+        referencedMaterials = Array.from(uniqueMats.values());
         
         console.log(`Retrieved ${chunks.length} relevant material chunks`);
         
@@ -201,7 +212,8 @@ OUTPUT FORMAT - Return ONLY valid JSON with no markdown:
   "metadata": {
     "question_number": <number or null>,
     "topic_tag": "<main concept discussed>",
-    "confusion_flag": <true if student shows confusion/frustration>
+    "confusion_flag": <true if student shows confusion/frustration>,
+    "materials_referenced": ${JSON.stringify(referencedMaterials)}
   }
 }
 
@@ -271,6 +283,7 @@ Do not wrap your response in code fences or markdown. Return raw JSON only.
         question_number: questionNumber ?? null,
         topic_tag: assignmentTitle || null,
         confusion_flag: false,
+        materials_referenced: referencedMaterials,
       };
     } else {
       if (parsed.metadata.question_number == null && questionNumber != null) {
@@ -281,6 +294,9 @@ Do not wrap your response in code fences or markdown. Return raw JSON only.
       }
       if (typeof parsed.metadata.confusion_flag !== "boolean") {
         parsed.metadata.confusion_flag = false;
+      }
+      if (!parsed.metadata.materials_referenced) {
+        parsed.metadata.materials_referenced = referencedMaterials;
       }
     }
 
