@@ -50,64 +50,49 @@ const MaterialsList = ({ courseId, assignmentId }: MaterialsListProps) => {
 
   if (loading) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Materials</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">Loading...</p>
-        </CardContent>
-      </Card>
+      <div className="text-sm text-muted-foreground">
+        Loading materials...
+      </div>
     );
   }
 
   if (materials.length === 0) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Materials</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">
-            No materials available for this assignment
-          </p>
-        </CardContent>
-      </Card>
+      <div className="text-sm text-muted-foreground">
+        No materials available
+      </div>
     );
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Materials</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-2">
+    <div className="space-y-2">
+      <h3 className="text-sm font-medium">Course Materials</h3>
+      <div className="space-y-1.5">
         {materials.map((material) => (
           <div
             key={material.id}
-            className="flex items-center justify-between p-3 border rounded-lg"
+            className="flex items-center justify-between gap-2 text-sm"
           >
-            <div className="flex items-center gap-3">
-              <FileText className="w-5 h-5 text-primary" />
-              <div>
-                <p className="font-medium">{material.title}</p>
-                <p className="text-sm text-muted-foreground capitalize">
+            <div className="flex items-center gap-2 min-w-0 flex-1">
+              <FileText className="w-4 h-4 text-muted-foreground shrink-0" />
+              <div className="min-w-0 flex-1">
+                <p className="font-medium truncate">{material.title}</p>
+                <p className="text-xs text-muted-foreground capitalize">
                   {material.kind}
                 </p>
               </div>
             </div>
             {material.downloadUrl && (
-              <Button size="sm" variant="outline" asChild>
+              <Button size="sm" variant="ghost" asChild className="shrink-0 h-8 px-2">
                 <a href={material.downloadUrl} download>
-                  <Download className="w-4 h-4 mr-1" />
-                  Download
+                  <Download className="w-3.5 h-3.5" />
                 </a>
               </Button>
             )}
           </div>
         ))}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
 

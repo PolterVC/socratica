@@ -72,16 +72,16 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-primary">Socratica</h1>
-          <Button variant="outline" onClick={handleSignOut}>
+      <header className="border-b bg-card">
+        <div className="container mx-auto px-6 h-14 flex items-center justify-between">
+          <h1 className="text-xl font-bold tracking-tight">Socratica</h1>
+          <Button variant="ghost" onClick={handleSignOut} size="sm">
             Sign Out
           </Button>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-6 py-8">
         {role === "student" && <StudentDashboard user={user!} />}
         {role === "teacher" && <TeacherDashboard user={user!} />}
         {!role && (

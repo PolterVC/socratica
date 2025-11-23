@@ -127,94 +127,93 @@ const StudentDashboard = ({ user }: StudentDashboardProps) => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <h2 className="text-3xl font-bold">Student Dashboard</h2>
-        <p className="text-muted-foreground mt-2">
-          Select an assignment to start chatting with Socratica
+        <h2 className="text-2xl font-semibold tracking-tight">Your Courses</h2>
+        <p className="text-muted-foreground mt-1">
+          Select an assignment to start a conversation
         </p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Join a Course</CardTitle>
-          <CardDescription>Enter the join code provided by your teacher</CardDescription>
+      <Card className="border-2">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-lg">Join a Course</CardTitle>
+          <CardDescription>Enter the code from your teacher</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={joinCourse} className="flex gap-2">
+          <form onSubmit={joinCourse} className="flex gap-3">
             <Input
               value={joinCode}
               onChange={(e) => setJoinCode(e.target.value)}
               placeholder="Enter join code"
               className="flex-1"
             />
-            <Button type="submit">Join</Button>
+            <Button type="submit" size="default">Join</Button>
           </form>
         </CardContent>
       </Card>
 
-      <div>
-        <h3 className="text-xl font-semibold mb-4">My Courses</h3>
-      </div>
-
       {courses.length === 0 ? (
         <Card>
-          <CardContent className="py-12">
+          <CardContent className="py-16">
             <div className="text-center">
-              <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+              <BookOpen className="h-10 w-10 text-muted-foreground mx-auto mb-3 opacity-50" />
               <p className="text-muted-foreground">
-                No courses available yet. Check back later!
+                No courses yet. Join a course using the code above.
               </p>
             </div>
           </CardContent>
         </Card>
       ) : (
-        courses.map(course => {
-          const courseAssignments = assignments.filter(a => a.course_id === course.id);
-          
-          return (
-            <Card key={course.id}>
-              <CardHeader>
-                <CardTitle>{course.code} - {course.title}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {courseAssignments.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">No assignments yet</p>
-                ) : (
-                  <div className="grid gap-3">
-                    {courseAssignments.map(assignment => (
-                      <div
-                        key={assignment.id}
-                        className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors"
-                      >
-                        <div>
-                          <h3 className="font-medium">{assignment.title}</h3>
-                          {assignment.description && (
-                            <p className="text-sm text-muted-foreground mt-1">
-                              {assignment.description}
-                            </p>
-                          )}
-                          {assignment.due_date && (
-                            <p className="text-xs text-muted-foreground mt-2">
-                              Due: {new Date(assignment.due_date).toLocaleDateString()}
-                            </p>
-                          )}
-                        </div>
-                        <Button
-                          onClick={() => startChat(assignment.id, course.id)}
-                          className="ml-4"
+        <div className="space-y-6">
+          {courses.map(course => {
+            const courseAssignments = assignments.filter(a => a.course_id === course.id);
+            
+            return (
+              <Card key={course.id}>
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-lg">{course.code} – {course.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {courseAssignments.length === 0 ? (
+                    <p className="text-sm text-muted-foreground py-4">No assignments yet</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {courseAssignments.map(assignment => (
+                        <div
+                          key={assignment.id}
+                          className="flex items-start justify-between gap-4 p-4 border rounded-lg hover:bg-accent/30 transition-colors"
                         >
-                          <MessageSquare className="h-4 w-4 mr-2" />
-                          Start Chat
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          );
-        })
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-medium">{assignment.title}</h3>
+                            {assignment.description && (
+                              <p className="text-sm text-muted-foreground mt-1.5 line-clamp-2">
+                                {assignment.description}
+                              </p>
+                            )}
+                            {assignment.due_date && (
+                              <p className="text-xs text-muted-foreground mt-2">
+                                Due {new Date(assignment.due_date).toLocaleDateString()}
+                              </p>
+                            )}
+                          </div>
+                          <Button
+                            onClick={() => startChat(assignment.id, course.id)}
+                            className="shrink-0"
+                            size="sm"
+                          >
+                            <MessageSquare className="h-4 w-4 mr-1.5" />
+                            Chat
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
       )}
     </div>
   );

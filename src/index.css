@@ -5,26 +5,26 @@
 
 @layer base {
   :root {
-    --background: 250 100% 99%;
-    --foreground: 250 10% 10%;
+    --background: 0 0% 100%;
+    --foreground: 0 0% 5%;
     --card: 0 0% 100%;
-    --card-foreground: 250 10% 10%;
+    --card-foreground: 0 0% 5%;
     --popover: 0 0% 100%;
-    --popover-foreground: 250 10% 10%;
+    --popover-foreground: 0 0% 5%;
     --primary: 354 85% 52%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 0%;
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 45%;
+    --secondary: 0 0% 97%;
+    --secondary-foreground: 0 0% 5%;
+    --muted: 0 0% 97%;
+    --muted-foreground: 0 0% 40%;
     --accent: 354 85% 52%;
     --accent-foreground: 0 0% 100%;
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
-    --border: 250 20% 90%;
-    --input: 250 20% 90%;
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
     --ring: 354 85% 52%;
-    --radius: 0.75rem;
+    --radius: 0.5rem;
   }
 }
 
@@ -34,6 +34,12 @@
   }
   body {
     @apply bg-background text-foreground overflow-x-hidden;
+    font-feature-settings: "kern" 1, "liga" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
   }
 }
 
