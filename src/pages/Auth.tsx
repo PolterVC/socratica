@@ -91,20 +91,20 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-bold text-primary">Socratica</CardTitle>
-          <CardDescription>AI-powered Socratic tutoring for students</CardDescription>
+      <Card className="w-full max-w-md border-0 shadow-lg">
+        <CardHeader className="text-center space-y-2 pb-6">
+          <CardTitle className="text-3xl font-bold tracking-tight">Socratica</CardTitle>
+          <CardDescription className="text-base">Socratic tutoring with AI guidance</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pb-8">
           <Tabs defaultValue="signin" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="signin">Sign In</TabsTrigger>
               <TabsTrigger value="signup">Sign Up</TabsTrigger>
             </TabsList>
             
-            <TabsContent value="signin">
-              <form onSubmit={handleSignIn} className="space-y-4">
+            <TabsContent value="signin" className="mt-6">
+              <form onSubmit={handleSignIn} className="space-y-5">
                 <div className="space-y-2">
                   <Label htmlFor="signin-email">Email</Label>
                   <Input
@@ -132,8 +132,8 @@ const Auth = () => {
               </form>
             </TabsContent>
             
-            <TabsContent value="signup">
-              <form onSubmit={handleSignUp} className="space-y-4">
+            <TabsContent value="signup" className="mt-6">
+              <form onSubmit={handleSignUp} className="space-y-5">
                 <div className="space-y-2">
                   <Label htmlFor="signup-name">Full Name</Label>
                   <Input

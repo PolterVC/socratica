@@ -141,13 +141,16 @@ const CoursesTab = ({ userId }: { userId: string }) => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h3 className="text-xl font-semibold">Your Courses</h3>
+    <div className="space-y-8">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-semibold tracking-tight">Courses & Assignments</h2>
+          <p className="text-muted-foreground mt-1">Manage your teaching materials</p>
+        </div>
         <Dialog open={showCourseDialog} onOpenChange={setShowCourseDialog}>
           <DialogTrigger asChild>
             <Button>
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="h-4 w-4 mr-1.5" />
               New Course
             </Button>
           </DialogTrigger>
@@ -186,17 +189,18 @@ const CoursesTab = ({ userId }: { userId: string }) => {
 
       {courses.length === 0 ? (
         <Card>
-          <CardContent className="py-12">
+          <CardContent className="py-16">
             <div className="text-center">
-              <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+              <BookOpen className="h-10 w-10 text-muted-foreground mx-auto mb-3 opacity-50" />
               <p className="text-muted-foreground">
-                No courses yet. Create your first course!
+                Create your first course to get started
               </p>
             </div>
           </CardContent>
         </Card>
       ) : (
-        courses.map((course) => {
+        <div className="space-y-6">
+          {courses.map((course) => {
           const courseAssignments = assignments.filter(
             (a) => a.course_id === course.id
           );
@@ -434,7 +438,8 @@ const CoursesTab = ({ userId }: { userId: string }) => {
               </CardContent>
             </Card>
           );
-        })
+        })}
+        </div>
       )}
     </div>
   );

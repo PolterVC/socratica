@@ -201,127 +201,114 @@ const Chat = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container mx-auto px-4 h-16 flex items-center">
-          <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
-            <ArrowLeft className="h-5 w-5" />
+      <header className="border-b bg-card">
+        <div className="container mx-auto px-6 h-14 flex items-center gap-4">
+          <Button variant="ghost" size="icon" onClick={() => navigate("/")} className="shrink-0">
+            <ArrowLeft className="h-4 w-4" />
           </Button>
           {conversationInfo && (
-            <div className="ml-4">
-              <h1 className="text-lg font-semibold">
-                {conversationInfo.course.code}{" "}
-                {conversationInfo.course.title
-                  ? `- ${conversationInfo.course.title}`
-                  : ""}
+            <div className="min-w-0 flex-1">
+              <h1 className="text-base font-semibold truncate">
+                {conversationInfo.course.code} – {conversationInfo.assignment.title}
               </h1>
-              <p className="text-sm text-muted-foreground">
-                {conversationInfo.assignment.title}
-              </p>
             </div>
           )}
         </div>
       </header>
 
-      <div className="container mx-auto flex-1 py-6 flex gap-6">
-        <div className="flex-1 flex flex-col gap-4">
-          <Card className="flex-1 p-4 overflow-y-auto">
+      <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full px-6 py-8">
+        <div className="flex-1 flex flex-col gap-6 min-h-0">
+          <div className="flex-1 overflow-y-auto">
             {messages.length === 0 && !loading ? (
-              <p className="text-muted-foreground">
-                Start the conversation by asking about the assignment.
-              </p>
-            ) : null}
-            <div className="space-y-3">
-              {messages.map((message) => (
-                <div
-                    key={message.id}
-                    className={`flex ${
-                      message.sender === "student"
-                        ? "justify-end"
-                        : "justify-start"
-                    }`}
-                  >
-                  <div
-                    className={`max-w-[75%] rounded-lg p-3 ${
-                      message.sender === "student"
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted"
-                    }`}
-                  >
-                    <p className="whitespace-pre-wrap">{message.text}</p>
+              <div className="h-full flex items-center justify-center">
+                <p className="text-muted-foreground text-center max-w-md">
+                  Ask a question about the assignment. The tutor will guide you through thinking, not give you the answer.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {messages.map((message) => (
+                  <div key={message.id}>
+                    <div
+                      className={`flex ${
+                        message.sender === "student" ? "justify-end" : "justify-start"
+                      }`}
+                    >
+                      <div
+                        className={`max-w-[85%] rounded-lg px-4 py-3 ${
+                          message.sender === "student"
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-muted"
+                        }`}
+                      >
+                        <p className="whitespace-pre-wrap leading-relaxed">{message.text}</p>
+                      </div>
+                    </div>
+                    {message.sender === "student" && (
+                      <p className="text-xs text-muted-foreground mt-1 text-right mr-1">
+                        Logged for instructor insight
+                      </p>
+                    )}
                   </div>
-                </div>
-              ))}
-              {loading && (
-                <div className="flex justify-start">
-                  <div className="bg-muted rounded-lg p-3">
-                    <div className="flex space-x-2">
-                      <div className="w-2 h-2 bg-current rounded-full animate-bounce" />
-                      <div
-                        className="w-2 h-2 bg-current rounded-full animate-bounce"
-                        style={{ animationDelay: "0.1s" }}
-                      />
-                      <div
-                        className="w-2 h-2 bg-current rounded-full animate-bounce"
-                        style={{ animationDelay: "0.2s" }}
-                      />
+                ))}
+                {loading && (
+                  <div className="flex justify-start">
+                    <div className="bg-muted rounded-lg px-4 py-3">
+                      <div className="flex space-x-1.5">
+                        <div className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-bounce" />
+                        <div
+                          className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-bounce"
+                          style={{ animationDelay: "0.15s" }}
+                        />
+                        <div
+                          className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-bounce"
+                          style={{ animationDelay: "0.3s" }}
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
-              <div ref={messagesEndRef} />
-            </div>
-          </Card>
+                )}
+                <div ref={messagesEndRef} />
+              </div>
+            )}
+          </div>
 
-          <form onSubmit={sendMessage} className="flex gap-2">
-            <Select value={questionNumber} onValueChange={setQuestionNumber}>
-              <SelectTrigger className="w-32">
-                <SelectValue placeholder="Q#" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">None</SelectItem>
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
-                  <SelectItem key={n} value={n.toString()}>
-                    Q{n}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="shrink-0">
+            <form onSubmit={sendMessage} className="flex gap-3">
+              <Select value={questionNumber} onValueChange={setQuestionNumber}>
+                <SelectTrigger className="w-28 shrink-0">
+                  <SelectValue placeholder="Question" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">None</SelectItem>
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+                    <SelectItem key={n} value={n.toString()}>
+                      Q{n}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
 
-            <Input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask about the assignment. The tutor will guide you, not solve it."
-              className="flex-1"
-            />
-            <Button type="submit" disabled={loading}>
-              <Send className="w-4 h-4 mr-1" />
-              Send
-            </Button>
-          </form>
-        </div>
-
-        <div className="w-80 space-y-4">
-          {conversationInfo && (
-            <MaterialsList
-              courseId={conversationInfo.course.id}
-              assignmentId={conversationInfo.assignment.id}
-            />
-          )}
-          
-          <Card className="p-4">
-            <h2 className="font-semibold mb-2">Tutor rules</h2>
-            <p className="text-sm text-muted-foreground mb-2">
-              This tutor will not give you the full graded answer. It will ask
-              you to show your thinking and will give hints.
-            </p>
-            <p className="font-medium mb-2">Tips:</p>
-            <ul className="space-y-1 text-muted-foreground text-sm">
-              <li>• Break down complex problems</li>
-              <li>• Ask clarifying questions</li>
-              <li>• Show your work step by step</li>
-              <li>• Review tutor feedback carefully</li>
-            </ul>
-          </Card>
+              <Input
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Type your question..."
+                className="flex-1"
+                disabled={loading}
+              />
+              <Button type="submit" disabled={loading || !input.trim()} className="shrink-0">
+                <Send className="w-4 h-4" />
+              </Button>
+            </form>
+            {conversationInfo && (
+              <div className="mt-4 pt-4 border-t">
+                <MaterialsList
+                  courseId={conversationInfo.course.id}
+                  assignmentId={conversationInfo.assignment.id}
+                />
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
