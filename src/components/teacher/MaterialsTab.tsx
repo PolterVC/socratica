@@ -24,6 +24,7 @@ interface Material {
   id: string;
   title: string;
   kind: string;
+  file_size: number | null;
   text_extracted: boolean;
   created_at: string;
   downloadUrl: string | null;
@@ -35,7 +36,7 @@ const MaterialsTab = ({ courseId, assignmentId }: MaterialsTabProps) => {
   const [uploading, setUploading] = useState(false);
   
   const [title, setTitle] = useState("");
-  const [kind, setKind] = useState("reading");
+  const [kind, setKind] = useState("questions_with_answers");
   const [file, setFile] = useState<File | null>(null);
 
   useEffect(() => {
@@ -58,7 +59,7 @@ const MaterialsTab = ({ courseId, assignmentId }: MaterialsTabProps) => {
       if (!response.ok) throw new Error("Failed to load materials");
 
       const materialsData = await response.json();
-      setMaterials(materialsData);
+      setMaterials(materialsData.items || []);
     } catch (err) {
       console.error("Load materials error:", err);
       toast.error("Failed to load materials");
@@ -86,7 +87,7 @@ const MaterialsTab = ({ courseId, assignmentId }: MaterialsTabProps) => {
     setUploading(true);
 
     try {
-      // Step 1: Get signed upload URL
+      // Step 1: Get signed upload URL and precreate DB row
       const { data: uploadData, error: uploadError } = await supabase.functions.invoke(
         "materials-upload",
         {
@@ -94,11 +95,16 @@ const MaterialsTab = ({ courseId, assignmentId }: MaterialsTabProps) => {
             courseId,
             assignmentId: assignmentId || null,
             filename: file.name,
+            title,
+            kind,
+            fileSize: file.size,
           },
         }
       );
 
-      if (uploadError) throw uploadError;
+      if (uploadError || !uploadData?.uploadUrl) {
+        throw new Error(uploadData?.error || "Failed to create upload URL");
+      }
 
       // Step 2: Upload file to storage
       const uploadResponse = await fetch(uploadData.uploadUrl, {
@@ -112,42 +118,28 @@ const MaterialsTab = ({ courseId, assignmentId }: MaterialsTabProps) => {
 
       if (!uploadResponse.ok) throw new Error("File upload failed");
 
-      // Step 3: Create material record
-      const { data: materialData, error: materialError } = await supabase.functions.invoke(
-        "materials",
-        {
-          method: "POST",
-          body: {
-            courseId,
-            assignmentId: assignmentId || null,
-            title,
-            kind,
-            storagePath: uploadData.storagePath,
-          },
-        }
-      );
-
-      if (materialError) throw materialError;
-
-      // Step 4: Extract text from PDF
+      // Step 3: Extract text from PDF
       toast.info("Extracting text from PDF...");
       const { chunks } = await extractTextFromPDF(file);
 
-      // Step 5: Save chunks
+      // Step 4: Save chunks
       const { error: textError } = await supabase.functions.invoke("materials-text", {
         body: {
-          materialId: materialData.id,
+          materialId: uploadData.materialId,
           chunks,
         },
       });
 
-      if (textError) throw textError;
-
-      toast.success("Material uploaded and processed successfully!");
+      if (textError) {
+        console.error("Text extraction error:", textError);
+        toast.warning("Upload complete, but text extraction failed");
+      } else {
+        toast.success("Material uploaded and processed successfully!");
+      }
       
       // Reset form
       setTitle("");
-      setKind("reading");
+      setKind("questions_with_answers");
       setFile(null);
       
       // Reload materials
@@ -256,7 +248,10 @@ const MaterialsTab = ({ courseId, assignmentId }: MaterialsTabProps) => {
                     <div>
                       <p className="font-medium">{material.title}</p>
                       <p className="text-sm text-muted-foreground">
-                        {material.kind} •{" "}
+                        {material.kind.replace(/_/g, " ")} •{" "}
+                        {material.file_size
+                          ? `${(material.file_size / (1024 * 1024)).toFixed(1)} MB`
+                          : "Size unknown"} •{" "}
                         {new Date(material.created_at).toLocaleDateString()}
                       </p>
                     </div>
