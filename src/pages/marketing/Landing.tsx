@@ -2,10 +2,11 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Navbar from "@/components/marketing/Navbar";
-import LogoCarousel from "@/components/marketing/LogoCarousel";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { universityLogos } from "@/data/logos";
+import mcgillLogo from "@/assets/mcgill-logo.png";
+import udemLogo from "@/assets/udem-logo.png";
+import concordiaLogo from "@/assets/concordia-logo.png";
 
 const Landing = () => {
   const [user, setUser] = useState<any>(null);
@@ -62,11 +63,22 @@ const Landing = () => {
         Profs from these schools can&apos;t wait to test Socratica
       </h3>
 
-      <h2 className="text-center text-lg md:text-xl text-muted-foreground mb-8 px-6">
-        Profs from these schools can&apos;t wait to test Socratica
-      </h2>
-
-      <LogoCarousel logos={universityLogos} />
+      {/* University Logos */}
+      <section className="border-y bg-card overflow-hidden">
+        <div className="container mx-auto px-6 py-12">
+          <div className="relative">
+            <div className="flex animate-[scroll_30s_linear_infinite] gap-16 md:gap-24">
+              <img src={mcgillLogo} alt="McGill University" className="h-20 object-contain opacity-80 hover:opacity-100 transition-opacity" />
+              <img src={udemLogo} alt="Université de Montréal" className="h-20 object-contain opacity-80 hover:opacity-100 transition-opacity" />
+              <img src={concordiaLogo} alt="Concordia University" className="h-20 object-contain opacity-80 hover:opacity-100 transition-opacity" />
+              {/* Duplicate for seamless loop */}
+              <img src={mcgillLogo} alt="McGill University" className="h-20 object-contain opacity-80 hover:opacity-100 transition-opacity" />
+              <img src={udemLogo} alt="Université de Montréal" className="h-20 object-contain opacity-80 hover:opacity-100 transition-opacity" />
+              <img src={concordiaLogo} alt="Concordia University" className="h-20 object-contain opacity-80 hover:opacity-100 transition-opacity" />
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Problem/Solution Split */}
       <section className="container mx-auto px-6 py-32">
@@ -341,8 +353,8 @@ const Landing = () => {
             <div className="space-y-4">
               <h4 className="font-semibold text-foreground">Connect</h4>
               <div className="space-y-3 text-sm">
-                <a href="mailto:eli.polterovich@mail.mcgill.ca" className="block text-muted-foreground hover:text-foreground transition-colors">
-                  eli.polterovich@mail.mcgill.ca
+                <a href="mailto:support@socratica.app" className="block text-muted-foreground hover:text-foreground transition-colors">
+                  support@socratica.app
                 </a>
               </div>
             </div>

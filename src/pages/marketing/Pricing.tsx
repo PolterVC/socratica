@@ -115,7 +115,7 @@ const Pricing = () => {
         <div className="mt-16 text-center">
           <p className="text-muted-foreground mb-4">Need a custom plan for your institution?</p>
           <Button asChild variant="outline">
-            <a href="mailto:eli.polterovich@mail.mcgill.ca">Contact sales</a>
+            <a href="mailto:support@socratica.app">Contact sales</a>
           </Button>
         </div>
       </section>
