@@ -59,12 +59,13 @@ const Landing = () => {
         </div>
       </section>
 
+      <h3 className="text-center text-lg font-medium text-muted-foreground pt-12 pb-8">
+        Profs from these schools can&apos;t wait to test Socratica
+      </h3>
+
       {/* University Logos */}
       <section className="border-y bg-card overflow-hidden">
-        <div className="container mx-auto px-6 py-16">
-          <h3 className="text-center text-lg font-medium text-muted-foreground mb-12">
-            Tested by professors from these universities
-          </h3>
+        <div className="container mx-auto px-6 py-12">
           <div className="relative">
             <div className="flex animate-[scroll_30s_linear_infinite] gap-16 md:gap-24">
               <img src={mcgillLogo} alt="McGill University" className="h-20 object-contain opacity-80 hover:opacity-100 transition-opacity" />
