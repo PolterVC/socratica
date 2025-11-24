@@ -9,6 +9,8 @@ import { BarChart, X, Check } from "lucide-react";
 import mcgillLogo from "@/assets/mcgill-logo.png";
 import udemLogo from "@/assets/udem-logo.png";
 import concordiaLogo from "@/assets/concordia-logo.png";
+import analyticsScreenshot from "@/assets/analytics-screenshot.png";
+import chatScreenshot from "@/assets/chat-screenshot.png";
 import AnalyticsDonut from "@/components/marketing/AnalyticsDonut";
 import MiniBars from "@/components/marketing/MiniBars";
 import GuardrailsMock from "@/components/marketing/GuardrailsMock";
@@ -92,7 +94,45 @@ const Landing = () => {
             </p>
           </div>
 
-          
+          <div className="max-w-6xl mx-auto space-y-24">
+            {/* Analytics Dashboard */}
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              <div className="space-y-4">
+                <h3 className="font-serif text-3xl font-bold text-foreground">
+                  See where students struggle
+                </h3>
+                <p className="text-lg text-muted-foreground leading-relaxed">
+                  Visual analytics show which assignment questions generate the most help requests and which topics cause confusion. Identify knowledge gaps before the next class and adjust your instruction accordingly.
+                </p>
+              </div>
+              <div className="rounded-lg overflow-hidden border border-border shadow-lg bg-background">
+                <img 
+                  src={analyticsScreenshot} 
+                  alt="Analytics dashboard showing student engagement metrics and confusion topics"
+                  className="w-full h-auto"
+                />
+              </div>
+            </div>
+
+            {/* Chat Interface */}
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              <div className="order-2 md:order-1 rounded-lg overflow-hidden border border-border shadow-lg bg-background">
+                <img 
+                  src={chatScreenshot} 
+                  alt="Student chat interface with PDF assignment and Socratic tutoring"
+                  className="w-full h-auto"
+                />
+              </div>
+              <div className="order-1 md:order-2 space-y-4">
+                <h3 className="font-serif text-3xl font-bold text-foreground">
+                  Guided learning, not answers
+                </h3>
+                <p className="text-lg text-muted-foreground leading-relaxed">
+                  Students work alongside their assignment materials while the AI tutor asks clarifying questions. No direct solutions—just Socratic guidance that builds critical thinking and problem-solving skills.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
