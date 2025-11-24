@@ -67,7 +67,7 @@ const Landing = () => {
       <section className="border-y bg-card overflow-hidden">
         <div className="container mx-auto px-6 py-12">
           <div className="relative overflow-hidden">
-            <div className="flex animate-scroll gap-16 md:gap-24 will-change-transform">
+            <div className="flex animate-scroll gap-32 md:gap-48 will-change-transform">
               {/* Triple set for smooth infinite loop with pauses */}
               <img src={mcgillLogo} alt="McGill University" className="h-20 object-contain opacity-80 hover:opacity-100 transition-opacity" />
               <img src={udemLogo} alt="Université de Montréal" className="h-20 object-contain opacity-80 hover:opacity-100 transition-opacity" />
