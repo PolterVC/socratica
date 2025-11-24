@@ -262,13 +262,7 @@ const Landing = () => {
                   </div>
                   <Badge className="absolute top-4 right-4 text-xs">Why</Badge>
                   <p className="text-xs text-muted-foreground text-center">Question confusion trends</p>
-                  <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute inset-0 bg-background/95 rounded-lg p-4 flex flex-col gap-2">
-                    <p className="text-xs text-muted-foreground italic">"I'm confused about the equilibrium..."</p>
-                    <p className="text-xs text-muted-foreground italic">"Why does the curve shift left?"</p>
-                    <div className="mt-2">
-                      <Badge variant="outline" className="text-xs">Slides Week 3</Badge>
-                    </div>
-                  </div>
+                  
                 </div>
               </div>
             </Card>
