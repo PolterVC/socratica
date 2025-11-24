@@ -105,14 +105,14 @@ const Landing = () => {
                   Visual analytics show which assignment questions generate the most help requests and which topics cause confusion. Identify knowledge gaps before the next class and adjust your instruction accordingly.
                 </p>
               </div>
-              <div className="rounded-lg overflow-hidden border border-border shadow-lg bg-background">
+              <div className="rounded-lg overflow-hidden border border-border shadow-lg bg-background transition-all duration-300 hover:shadow-2xl hover:scale-[1.02]">
                 <img src={analyticsScreenshot} alt="Analytics dashboard showing student engagement metrics and confusion topics" className="w-full h-auto" />
               </div>
             </div>
 
             {/* Chat Interface */}
             <div className="grid md:grid-cols-2 gap-16 items-center">
-              <div className="order-2 md:order-1 rounded-lg overflow-hidden border border-border shadow-lg bg-background">
+              <div className="order-2 md:order-1 rounded-lg overflow-hidden border border-border shadow-lg bg-background transition-all duration-300 hover:shadow-2xl hover:scale-[1.02]">
                 <img src={chatScreenshot} alt="Student chat interface with PDF assignment and Socratic tutoring" className="w-full h-auto" />
               </div>
               <div className="order-1 md:order-2 space-y-4">
