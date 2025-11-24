@@ -260,7 +260,6 @@ const Landing = () => {
                     height: '90%'
                   }}></div>
                   </div>
-                  <Badge className="absolute top-4 right-4 text-xs">Why</Badge>
                   <p className="text-xs text-muted-foreground text-center">Question confusion trends</p>
                   
                 </div>
