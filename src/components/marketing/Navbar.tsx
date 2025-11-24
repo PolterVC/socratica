@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import logo from "@/assets/socratica-logo.png";
 
 const Navbar = () => {
   const [user, setUser] = useState<any>(null);
@@ -48,7 +47,7 @@ const Navbar = () => {
     <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
       <div className="container mx-auto px-6 h-16 flex items-center justify-between">
         <Link to="/" className="flex items-center">
-          <img src={logo} alt="Socratica" className="h-10 w-auto" />
+          <span className="font-serif text-3xl font-bold text-foreground">Socratica</span>
         </Link>
         
         <div className="flex items-center gap-6">
