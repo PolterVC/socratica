@@ -100,7 +100,7 @@ const StudentDashboard = ({ user }: StudentDashboardProps) => {
       .maybeSingle();
 
     if (existingConv) {
-      navigate(`/chat/${existingConv.id}`);
+      navigate(`/app/chat/${existingConv.id}`);
     } else {
       // Create new conversation
       const { data: newConv, error } = await supabase
@@ -117,7 +117,7 @@ const StudentDashboard = ({ user }: StudentDashboardProps) => {
         console.error('Error creating conversation:', error);
         toast.error('Error starting chat. Make sure you are enrolled in this course.');
       } else {
-        navigate(`/chat/${newConv.id}`);
+        navigate(`/app/chat/${newConv.id}`);
       }
     }
   };
