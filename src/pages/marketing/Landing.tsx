@@ -80,65 +80,6 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Problem/Solution Split */}
-      <section className="container mx-auto px-6 py-32">
-        <div className="grid md:grid-cols-2 gap-16 items-center max-w-6xl mx-auto">
-          <div className="space-y-6">
-            <h2 className="font-serif text-4xl md:text-5xl font-bold tracking-tight text-foreground">
-              The academic integrity problem
-            </h2>
-            <div className="space-y-4 text-lg text-muted-foreground leading-relaxed">
-              <p>
-                Students can now ask AI to solve their homework in seconds. Traditional education is failing to adapt.
-              </p>
-              <p>
-                Socratica refuses to give direct answers. Instead, it asks guiding questions that build genuine understanding and critical thinking skills.
-              </p>
-              <p className="font-medium text-foreground">
-                The result: Students learn. Teachers regain confidence in assessment.
-              </p>
-            </div>
-          </div>
-          
-          <Card className="p-8 bg-secondary/50 border-border/50">
-            <div className="space-y-4">
-              <div className="flex gap-3">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <span className="text-sm font-bold text-primary">S</span>
-                </div>
-                <div className="flex-1 bg-primary/10 rounded-lg px-4 py-3">
-                  <p className="text-sm text-foreground">
-                    "What's the answer to problem 3?"
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex gap-3">
-                <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
-                  <span className="text-xs font-medium text-muted-foreground">AI</span>
-                </div>
-                <div className="flex-1 bg-card rounded-lg px-4 py-3 border">
-                  <p className="text-sm text-foreground leading-relaxed">
-                    "I can't give you the answer directly. Let's think through this together. What information does the problem give you?"
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex gap-3">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <span className="text-sm font-bold text-primary">S</span>
-                </div>
-                <div className="flex-1 bg-primary/10 rounded-lg px-4 py-3">
-                  <p className="text-sm text-foreground">
-                    "It gives me the mass and velocity..."
-                  </p>
-                </div>
-              </div>
-            </div>
-          </Card>
-        </div>
-      </section>
-
       {/* Features Section */}
       <section className="bg-secondary/30 py-32">
         <div className="container mx-auto px-6">
