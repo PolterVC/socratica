@@ -5,7 +5,7 @@ import { User } from "@supabase/supabase-js";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { BookOpen, MessageSquare } from "lucide-react";
+import { BookOpen, MessageSquare, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 
 interface Course {
@@ -38,6 +38,7 @@ const StudentDashboard = ({ user }: StudentDashboardProps) => {
   }, []);
 
   const loadData = async () => {
+    setLoading(true);
     // Fetch enrolled courses
     const { data: enrollmentsData } = await supabase
       .from('enrollments')
@@ -128,11 +129,23 @@ const StudentDashboard = ({ user }: StudentDashboardProps) => {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h2 className="text-2xl font-semibold tracking-tight">Your Courses</h2>
-        <p className="text-muted-foreground mt-1">
-          Select an assignment to start a conversation
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-semibold tracking-tight">Your Courses</h2>
+          <p className="text-muted-foreground mt-1">
+            Select an assignment to start a conversation
+          </p>
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={loadData}
+          disabled={loading}
+          className="gap-2"
+        >
+          <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+          Refresh
+        </Button>
       </div>
 
       <Card className="border-2">
