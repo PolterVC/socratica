@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, FormEvent } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,7 +10,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Card } from "@/components/ui/card";
 import { Send, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import MaterialsList from "@/components/student/MaterialsList";
@@ -48,6 +47,22 @@ const Chat = () => {
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+
+  // Fetch user role for navigation
+  useEffect(() => {
+    const fetchRole = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        const { data } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', session.user.id)
+          .single();
+        setUserRole(data?.role || "student");
+      }
+    };
+    fetchRole();
+  }, []);
 
   // load conversation and messages when id changes
   useEffect(() => {
@@ -214,14 +229,20 @@ const Chat = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <header className="border-b bg-card">
-        <div className="container mx-auto px-6 h-14 flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate(userRole === "teacher" ? "/app/teacher" : "/app/student")} className="shrink-0">
-            <ArrowLeft className="h-4 w-4" />
+      <header className="border-b border-border/10 bg-white sticky top-0 z-10 shadow-sm">
+        <div className="container mx-auto px-6 h-16 flex items-center gap-4">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => navigate(userRole === "teacher" ? "/app/teacher" : "/app/student")} 
+            className="shrink-0 hover:bg-muted/50" 
+            title="Go Back"
+          >
+            <ArrowLeft className="h-5 w-5" />
           </Button>
           {conversationInfo && (
             <div className="min-w-0 flex-1">
-              <h1 className="text-base font-semibold truncate">
+              <h1 className="text-lg font-semibold text-foreground truncate font-sans tracking-tight">
                 {conversationInfo.course.code} – {conversationInfo.assignment.title}
               </h1>
             </div>
@@ -229,14 +250,19 @@ const Chat = () => {
         </div>
       </header>
 
-      <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full px-6 py-8">
-        <div className="flex-1 flex flex-col gap-6 min-h-0">
-          <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 flex flex-col max-w-5xl mx-auto w-full px-6 py-10">
+        <div className="flex-1 flex flex-col gap-8 min-h-0">
+          <div className="flex-1 overflow-y-auto pr-2 space-y-1">
             {messages.length === 0 && !loading ? (
               <div className="h-full flex items-center justify-center">
-                <p className="text-muted-foreground text-center max-w-md">
-                  Ask a question about the assignment. The tutor will guide you through thinking, not give you the answer.
-                </p>
+                <div className="text-center max-w-lg space-y-2">
+                  <p className="text-foreground/60 text-base leading-relaxed">
+                    Ask a question about the assignment.
+                  </p>
+                  <p className="text-foreground/40 text-sm">
+                    The tutor will guide you through thinking, not give you the answer.
+                  </p>
+                </div>
               </div>
             ) : (
               <div className="space-y-6">
@@ -248,24 +274,24 @@ const Chat = () => {
                       }`}
                     >
                       <div
-                        className={`max-w-[85%] rounded-lg px-4 py-3 ${
+                        className={`max-w-[75%] rounded-xl px-5 py-4 ${
                           message.sender === "student"
-                            ? "bg-primary text-primary-foreground"
-                            : "bg-muted"
+                            ? "bg-primary text-primary-foreground shadow-sm"
+                            : "bg-muted/50 border border-border/20"
                         }`}
                       >
-                        <p className="whitespace-pre-wrap leading-relaxed">{message.text}</p>
+                        <p className="whitespace-pre-wrap leading-relaxed text-[15px]">{message.text}</p>
                         {message.sender === "tutor" && message.materials_referenced && message.materials_referenced.length > 0 && (
-                          <div className="mt-3 pt-3 border-t border-border/40">
-                            <p className="text-xs font-medium mb-2 opacity-70">Referenced materials:</p>
+                          <div className="mt-4 pt-4 border-t border-border/20">
+                            <p className="text-xs font-medium mb-2.5 text-foreground/50 uppercase tracking-wide">Referenced materials</p>
                             <div className="flex flex-wrap gap-2">
                               {message.materials_referenced.map((mat, idx) => (
                                 <span
                                   key={idx}
-                                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs bg-background/60 border border-border/50"
+                                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs bg-background border border-border/30"
                                 >
-                                  <span className="opacity-60">{mat.kind}</span>
-                                  <span className="font-medium">{mat.title}</span>
+                                  <span className="text-foreground/40 font-medium">{mat.kind}</span>
+                                  <span className="text-foreground/70">{mat.title}</span>
                                 </span>
                               ))}
                             </div>
@@ -274,7 +300,7 @@ const Chat = () => {
                       </div>
                     </div>
                     {message.sender === "student" && (
-                      <p className="text-xs text-muted-foreground mt-1 text-right mr-1">
+                      <p className="text-[11px] text-foreground/30 mt-2 text-right mr-1 uppercase tracking-wider">
                         Logged for instructor insight
                       </p>
                     )}
@@ -282,15 +308,15 @@ const Chat = () => {
                 ))}
                 {loading && (
                   <div className="flex justify-start">
-                    <div className="bg-muted rounded-lg px-4 py-3">
+                    <div className="bg-muted/50 border border-border/20 rounded-xl px-5 py-4">
                       <div className="flex space-x-1.5">
-                        <div className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-bounce" />
+                        <div className="w-2 h-2 bg-foreground/40 rounded-full animate-bounce" />
                         <div
-                          className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-bounce"
+                          className="w-2 h-2 bg-foreground/40 rounded-full animate-bounce"
                           style={{ animationDelay: "0.15s" }}
                         />
                         <div
-                          className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-bounce"
+                          className="w-2 h-2 bg-foreground/40 rounded-full animate-bounce"
                           style={{ animationDelay: "0.3s" }}
                         />
                       </div>
@@ -302,14 +328,14 @@ const Chat = () => {
             )}
           </div>
 
-          <div className="shrink-0">
+          <div className="shrink-0 bg-background pt-6 border-t border-border/10">
             <form onSubmit={sendMessage} className="flex gap-3">
               <Select value={questionNumber} onValueChange={setQuestionNumber}>
-                <SelectTrigger className="w-28 shrink-0">
+                <SelectTrigger className="w-32 shrink-0 bg-white border-border/20 font-medium">
                   <SelectValue placeholder="Question" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="none">None</SelectItem>
+                  <SelectItem value="none">General</SelectItem>
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
                     <SelectItem key={n} value={n.toString()}>
                       Q{n}
@@ -322,15 +348,15 @@ const Chat = () => {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Type your question..."
-                className="flex-1"
+                className="flex-1 bg-white border-border/20 h-11 text-[15px]"
                 disabled={loading}
               />
-              <Button type="submit" disabled={loading || !input.trim()} className="shrink-0">
+              <Button type="submit" disabled={loading || !input.trim()} className="shrink-0 h-11 px-5">
                 <Send className="w-4 h-4" />
               </Button>
             </form>
             {conversationInfo && (
-              <div className="mt-4 pt-4 border-t">
+              <div className="mt-6 pt-6 border-t border-border/10">
                 <MaterialsList
                   courseId={conversationInfo.course.id}
                   assignmentId={conversationInfo.assignment.id}
