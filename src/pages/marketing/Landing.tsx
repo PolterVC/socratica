@@ -64,21 +64,12 @@ const Landing = () => {
       </h3>
 
       {/* University Logos */}
-      <section className="border-y bg-card overflow-hidden">
+      <section className="border-y bg-card">
         <div className="container mx-auto px-6 py-12">
-          <div className="relative overflow-hidden flex justify-center">
-            <div className="flex animate-scroll gap-20 md:gap-28 will-change-transform">
-              {/* Triple set for smooth infinite loop with pauses */}
-              <img src={mcgillLogo} alt="McGill University" className="h-20 object-contain opacity-80 hover:opacity-100 transition-opacity" />
-              <img src={udemLogo} alt="Université de Montréal" className="h-20 object-contain opacity-80 hover:opacity-100 transition-opacity" />
-              <img src={concordiaLogo} alt="Concordia University" className="h-20 object-contain opacity-80 hover:opacity-100 transition-opacity" />
-              <img src={mcgillLogo} alt="McGill University" className="h-20 object-contain opacity-80 hover:opacity-100 transition-opacity" />
-              <img src={udemLogo} alt="Université de Montréal" className="h-20 object-contain opacity-80 hover:opacity-100 transition-opacity" />
-              <img src={concordiaLogo} alt="Concordia University" className="h-20 object-contain opacity-80 hover:opacity-100 transition-opacity" />
-              <img src={mcgillLogo} alt="McGill University" className="h-20 object-contain opacity-80 hover:opacity-100 transition-opacity" />
-              <img src={udemLogo} alt="Université de Montréal" className="h-20 object-contain opacity-80 hover:opacity-100 transition-opacity" />
-              <img src={concordiaLogo} alt="Concordia University" className="h-20 object-contain opacity-80 hover:opacity-100 transition-opacity" />
-            </div>
+          <div className="flex items-center justify-center gap-12 md:gap-20 flex-wrap">
+            <img src={mcgillLogo} alt="McGill University" className="h-16 md:h-20 object-contain opacity-70 hover:opacity-100 transition-opacity" />
+            <img src={udemLogo} alt="Université de Montréal" className="h-16 md:h-20 object-contain opacity-70 hover:opacity-100 transition-opacity" />
+            <img src={concordiaLogo} alt="Concordia University" className="h-16 md:h-20 object-contain opacity-70 hover:opacity-100 transition-opacity" />
           </div>
         </div>
       </section>
