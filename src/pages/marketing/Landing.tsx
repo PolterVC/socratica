@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/marketing/Navbar";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { BarChart, Shield, X, Check } from "lucide-react";
+import { BarChart, X, Check } from "lucide-react";
 import mcgillLogo from "@/assets/mcgill-logo.png";
 import udemLogo from "@/assets/udem-logo.png";
 import concordiaLogo from "@/assets/concordia-logo.png";
@@ -285,11 +285,8 @@ const Landing = () => {
                     </div>
                   </div>
                   <div className="flex items-center justify-center gap-2 py-2">
-                    <Shield className="w-4 h-4 text-primary" />
-                    <div className="flex gap-2">
-                      <Badge variant="secondary" className="text-xs">No direct answers</Badge>
-                      <Badge variant="secondary" className="text-xs">Citations required</Badge>
-                    </div>
+                    
+                    
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-full bg-green-500/10 flex items-center justify-center flex-shrink-0">
