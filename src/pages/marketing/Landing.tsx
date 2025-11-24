@@ -235,36 +235,18 @@ const Landing = () => {
                     Every chart has a Why button that shows the examples and sources behind an alert, so instructors can trust what they are seeing.
                   </p>
                 </div>
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="bg-secondary/50 rounded-lg p-6 border border-border/30">
-                    <div className="space-y-3">
-                      <div className="flex items-start gap-3">
-                        <div className="w-2 h-2 rounded-full bg-primary mt-2"></div>
-                        <p className="text-sm text-foreground">"Top 3 questions driving confusion"</p>
-                      </div>
-                      <div className="flex items-start gap-3">
-                        <div className="w-2 h-2 rounded-full bg-primary mt-2"></div>
-                        <p className="text-sm text-foreground">"PDF snippets used in answers"</p>
-                      </div>
-                      <div className="flex items-start gap-3">
-                        <div className="w-2 h-2 rounded-full bg-primary mt-2"></div>
-                        <p className="text-sm text-foreground">"3 anonymized chat examples"</p>
-                      </div>
-                    </div>
+                <div className="bg-secondary/50 rounded-lg p-6 border border-border/30 relative group">
+                  <div className="flex items-end gap-2 h-24 mb-4">
+                    <div className="flex-1 bg-muted rounded-t" style={{ height: '50%' }}></div>
+                    <div className="flex-1 bg-primary/70 rounded-t" style={{ height: '75%' }}></div>
+                    <div className="flex-1 bg-primary rounded-t" style={{ height: '90%' }}></div>
                   </div>
-                  <div className="bg-secondary/50 rounded-lg p-6 border border-border/30 relative group">
-                    <div className="flex items-end gap-2 h-24 mb-4">
-                      <div className="flex-1 bg-muted rounded-t" style={{ height: '50%' }}></div>
-                      <div className="flex-1 bg-primary/70 rounded-t" style={{ height: '75%' }}></div>
-                      <div className="flex-1 bg-primary rounded-t" style={{ height: '90%' }}></div>
-                    </div>
-                    <Badge className="absolute top-4 right-4 text-xs">Why</Badge>
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute inset-0 bg-background/95 rounded-lg p-4 flex flex-col gap-2">
-                      <p className="text-xs text-muted-foreground italic">"I'm confused about the equilibrium..."</p>
-                      <p className="text-xs text-muted-foreground italic">"Why does the curve shift left?"</p>
-                      <div className="mt-2">
-                        <Badge variant="outline" className="text-xs">Slides Week 3</Badge>
-                      </div>
+                  <Badge className="absolute top-4 right-4 text-xs">Why</Badge>
+                  <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute inset-0 bg-background/95 rounded-lg p-4 flex flex-col gap-2">
+                    <p className="text-xs text-muted-foreground italic">"I'm confused about the equilibrium..."</p>
+                    <p className="text-xs text-muted-foreground italic">"Why does the curve shift left?"</p>
+                    <div className="mt-2">
+                      <Badge variant="outline" className="text-xs">Slides Week 3</Badge>
                     </div>
                   </div>
                 </div>
