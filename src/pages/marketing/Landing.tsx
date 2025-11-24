@@ -227,7 +227,7 @@ const Landing = () => {
             </Card>
 
             {/* Explainable Insights */}
-            <Card className="md:col-span-2 p-8 bg-card border-border/50 hover:border-border transition-colors">
+            <Card className="p-8 bg-card border-border/50 hover:border-border transition-colors">
               <div className="space-y-6">
                 <div>
                   <h3 className="text-2xl font-bold text-foreground mb-2">Explainable insights</h3>
