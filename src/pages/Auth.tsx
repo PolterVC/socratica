@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { ArrowLeft } from "lucide-react";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -104,23 +105,46 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md border-0 shadow-lg">
-        <CardHeader className="text-center space-y-2 pb-6">
-          <CardTitle className="text-3xl font-bold tracking-tight">Socratica</CardTitle>
-          <CardDescription className="text-base">Socratic tutoring with AI guidance</CardDescription>
+    <div className="min-h-screen flex items-center justify-center bg-background p-6 relative">
+      <div className="absolute top-6 left-6 md:top-10 md:left-10">
+        <Button variant="ghost" asChild className="pl-0 hover:bg-transparent group">
+          <Link to="/" className="flex items-center gap-2.5 text-foreground/50 hover:text-foreground transition-colors">
+            <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
+            <span className="text-sm font-medium">Back to Home</span>
+          </Link>
+        </Button>
+      </div>
+
+      <Card className="w-full max-w-lg border border-border/20 shadow-2xl bg-white">
+        <CardHeader className="text-center space-y-3 pb-8 pt-10">
+          <CardTitle className="text-4xl font-serif font-bold tracking-tight text-foreground">Socratica</CardTitle>
+          <CardDescription className="text-base text-foreground/60">
+            Socratic tutoring with AI guidance
+          </CardDescription>
         </CardHeader>
-        <CardContent className="pb-8">
+        <CardContent className="pb-10 px-8">
           <Tabs defaultValue="signin" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="signin">Sign In</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 bg-muted/30 p-1 h-11">
+              <TabsTrigger 
+                value="signin" 
+                className="data-[state=active]:bg-white data-[state=active]:shadow-sm font-medium text-[15px]"
+              >
+                Sign In
+              </TabsTrigger>
+              <TabsTrigger 
+                value="signup"
+                className="data-[state=active]:bg-white data-[state=active]:shadow-sm font-medium text-[15px]"
+              >
+                Sign Up
+              </TabsTrigger>
             </TabsList>
             
-            <TabsContent value="signin" className="mt-6">
-              <form onSubmit={handleSignIn} className="space-y-5">
-                <div className="space-y-2">
-                  <Label htmlFor="signin-email">Email</Label>
+            <TabsContent value="signin" className="mt-8">
+              <form onSubmit={handleSignIn} className="space-y-6">
+                <div className="space-y-2.5">
+                  <Label htmlFor="signin-email" className="text-sm font-medium text-foreground/80">
+                    Email Address
+                  </Label>
                   <Input
                     id="signin-email"
                     type="email"
@@ -128,28 +152,38 @@ const Auth = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
+                    className="h-11 bg-white border-border/20 text-[15px]"
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signin-password">Password</Label>
+                <div className="space-y-2.5">
+                  <Label htmlFor="signin-password" className="text-sm font-medium text-foreground/80">
+                    Password
+                  </Label>
                   <Input
                     id="signin-password"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
+                    className="h-11 bg-white border-border/20 text-[15px]"
                   />
                 </div>
-                <Button type="submit" className="w-full" disabled={loading}>
+                <Button 
+                  type="submit" 
+                  className="w-full h-11 text-[15px] font-semibold mt-8" 
+                  disabled={loading}
+                >
                   {loading ? "Signing in..." : "Sign In"}
                 </Button>
               </form>
             </TabsContent>
             
-            <TabsContent value="signup" className="mt-6">
-              <form onSubmit={handleSignUp} className="space-y-5">
-                <div className="space-y-2">
-                  <Label htmlFor="signup-name">Full Name</Label>
+            <TabsContent value="signup" className="mt-8">
+              <form onSubmit={handleSignUp} className="space-y-6">
+                <div className="space-y-2.5">
+                  <Label htmlFor="signup-name" className="text-sm font-medium text-foreground/80">
+                    Full Name
+                  </Label>
                   <Input
                     id="signup-name"
                     type="text"
@@ -157,10 +191,13 @@ const Auth = () => {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required
+                    className="h-11 bg-white border-border/20 text-[15px]"
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signup-email">Email</Label>
+                <div className="space-y-2.5">
+                  <Label htmlFor="signup-email" className="text-sm font-medium text-foreground/80">
+                    Email Address
+                  </Label>
                   <Input
                     id="signup-email"
                     type="email"
@@ -168,33 +205,50 @@ const Auth = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
+                    className="h-11 bg-white border-border/20 text-[15px]"
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signup-password">Password</Label>
+                <div className="space-y-2.5">
+                  <Label htmlFor="signup-password" className="text-sm font-medium text-foreground/80">
+                    Password
+                  </Label>
                   <Input
                     id="signup-password"
                     type="password"
+                    placeholder="Minimum 6 characters"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     minLength={6}
+                    className="h-11 bg-white border-border/20 text-[15px]"
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label>I am a</Label>
-                  <RadioGroup value={role} onValueChange={(value: "student" | "teacher") => setRole(value)}>
-                    <div className="flex items-center space-x-2">
+                <div className="space-y-3">
+                  <Label className="text-sm font-medium text-foreground/80">I am a</Label>
+                  <RadioGroup 
+                    value={role} 
+                    onValueChange={(value: "student" | "teacher") => setRole(value)}
+                    className="space-y-3"
+                  >
+                    <div className="flex items-center space-x-3 p-3 rounded-lg border border-border/20 hover:bg-muted/20 transition-colors cursor-pointer">
                       <RadioGroupItem value="student" id="student" />
-                      <Label htmlFor="student" className="font-normal cursor-pointer">Student</Label>
+                      <Label htmlFor="student" className="font-normal cursor-pointer flex-1 text-[15px]">
+                        Student
+                      </Label>
                     </div>
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-3 p-3 rounded-lg border border-border/20 hover:bg-muted/20 transition-colors cursor-pointer">
                       <RadioGroupItem value="teacher" id="teacher" />
-                      <Label htmlFor="teacher" className="font-normal cursor-pointer">Teacher</Label>
+                      <Label htmlFor="teacher" className="font-normal cursor-pointer flex-1 text-[15px]">
+                        Teacher
+                      </Label>
                     </div>
                   </RadioGroup>
                 </div>
-                <Button type="submit" className="w-full" disabled={loading}>
+                <Button 
+                  type="submit" 
+                  className="w-full h-11 text-[15px] font-semibold mt-8" 
+                  disabled={loading}
+                >
                   {loading ? "Creating account..." : "Create Account"}
                 </Button>
               </form>
