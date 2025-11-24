@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/marketing/Navbar";
 import { useEffect, useState } from "react";
@@ -9,6 +9,9 @@ import { BarChart, X, Check } from "lucide-react";
 import mcgillLogo from "@/assets/mcgill-logo.png";
 import udemLogo from "@/assets/udem-logo.png";
 import concordiaLogo from "@/assets/concordia-logo.png";
+import AnalyticsDonut from "@/components/marketing/AnalyticsDonut";
+import MiniBars from "@/components/marketing/MiniBars";
+import GuardrailsMock from "@/components/marketing/GuardrailsMock";
 const Landing = () => {
   const [user, setUser] = useState<any>(null);
   const [role, setRole] = useState<string | null>(null);
@@ -136,7 +139,7 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Bento Grid Features */}
+      {/* Features Section */}
       <section className="bg-secondary/30 py-32">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
@@ -148,156 +151,60 @@ const Landing = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-            {/* Large Feature Card */}
-            <Card className="md:col-span-2 p-8 bg-card border-border/50 hover:border-border transition-colors">
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-xl font-bold text-foreground mb-2">Socratic tutoring</h3>
-                  <p className="text-muted-foreground leading-relaxed">
-                    AI guides students through problems with targeted questions, never giving direct answers. Builds genuine understanding.
-                  </p>
+          <div className="grid gap-6 md:grid-cols-3 items-stretch max-w-6xl mx-auto">
+            {/* Teacher analytics */}
+            <Card className="h-full">
+              <CardHeader>
+                <CardTitle>Teacher analytics</CardTitle>
+                <CardDescription>
+                  See exactly where students struggle. Adjust instruction before the next class.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="h-full grid grid-rows-[auto_1fr_auto]">
+                <div />
+                <div />
+                <div className="rounded-2xl bg-muted flex items-center justify-center h-44 md:h-48 lg:h-56">
+                  <AnalyticsDonut className="h-24 w-24 md:h-28 md:w-28" />
                 </div>
-                <div className="bg-secondary/50 rounded-lg p-6 space-y-3 border border-border/30">
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 rounded-full bg-primary mt-2"></div>
-                    <p className="text-sm text-foreground">"What principles apply here?"</p>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 rounded-full bg-primary mt-2"></div>
-                    <p className="text-sm text-foreground">"What did we learn about this concept?"</p>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 rounded-full bg-primary mt-2"></div>
-                    <p className="text-sm text-foreground">"Can you break this into smaller steps?"</p>
-                  </div>
-                </div>
-              </div>
+              </CardContent>
             </Card>
 
-            {/* Material-Aware */}
-            <Card className="p-8 bg-card border-border/50 hover:border-border transition-colors">
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-xl font-bold text-foreground mb-2">Material-aware AI</h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed">
-                    References course materials and assignment guidelines to stay on topic and relevant.
-                  </p>
+            {/* Explainable insights */}
+            <Card className="h-full">
+              <CardHeader>
+                <CardTitle>Explainable insights</CardTitle>
+                <CardDescription>
+                  Every chart has a Why button that shows sources and examples.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="h-full grid grid-rows-[auto_1fr_auto]">
+                <p className="text-sm text-muted-foreground">
+                  Trust what you are seeing with quick evidence previews.
+                </p>
+                <div />
+                <div className="rounded-2xl bg-muted flex items-center justify-center h-44 md:h-48 lg:h-56">
+                  <MiniBars className="h-24 w-40" />
                 </div>
-                <div className="bg-secondary/50 rounded-lg p-4 border border-border/30">
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="w-8 h-8 rounded bg-muted flex items-center justify-center">
-                      <div className="w-4 h-5 border-2 border-muted-foreground/30 rounded-sm"></div>
-                    </div>
-                    <div className="text-xs font-medium text-foreground">Chapter_5.pdf</div>
-                  </div>
-                  <div className="space-y-1.5">
-                    <div className="h-1.5 bg-border rounded w-full"></div>
-                    <div className="h-1.5 bg-border rounded w-5/6"></div>
-                    <div className="h-1.5 bg-primary/30 rounded w-4/6"></div>
-                  </div>
-                </div>
-              </div>
+              </CardContent>
             </Card>
 
-            {/* Teacher Analytics */}
-            <Card className="p-8 bg-card border-border/50 hover:border-border transition-colors">
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-xl font-bold text-foreground mb-2">Teacher analytics</h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed">
-                    See exactly where students struggle. Adjust instruction before the next class.
-                  </p>
+            {/* Academic integrity */}
+            <Card className="h-full">
+              <CardHeader>
+                <CardTitle>Academic integrity</CardTitle>
+                <CardDescription>
+                  Guardrails block direct answers while allowing guided learning.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="h-full grid grid-rows-[auto_1fr_auto]">
+                <p className="text-sm text-muted-foreground">
+                  No solution dumps. Citations required.
+                </p>
+                <div />
+                <div className="rounded-2xl bg-muted flex items-center justify-center h-44 md:h-48 lg:h-56">
+                  <GuardrailsMock className="h-24 w-56" />
                 </div>
-                <div className="bg-secondary/50 rounded-lg p-6 border border-border/30 relative group mt-2 py-[60px]">
-                  <div className="flex items-center justify-center h-24 mb-4">
-                    <div className="relative w-20 h-20">
-                      <svg viewBox="0 0 100 100" className="transform -rotate-90">
-                        <circle cx="50" cy="50" r="40" fill="none" stroke="hsl(var(--muted))" strokeWidth="20" />
-                        <circle cx="50" cy="50" r="40" fill="none" stroke="hsl(var(--primary))" strokeWidth="20" strokeDasharray="125 251" strokeLinecap="round" />
-                        <circle cx="50" cy="50" r="40" fill="none" stroke="hsl(var(--primary) / 0.6)" strokeWidth="20" strokeDasharray="75 251" strokeDashoffset="-125" strokeLinecap="round" />
-                        <circle cx="50" cy="50" r="40" fill="none" stroke="hsl(var(--muted))" strokeWidth="20" strokeDasharray="51 251" strokeDashoffset="-200" strokeLinecap="round" />
-                      </svg>
-                    </div>
-                  </div>
-                  <p className="text-xs text-muted-foreground text-center">Topic confusion breakdown</p>
-                  <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute inset-0 bg-background/95 rounded-lg p-4 flex flex-col justify-center gap-3">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-primary"></div>
-                      <p className="text-xs text-foreground">Equilibrium - 45%</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-primary/60"></div>
-                      <p className="text-xs text-foreground">Supply curves - 30%</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-muted"></div>
-                      <p className="text-xs text-foreground">Other topics - 25%</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Card>
-
-            {/* Explainable Insights */}
-            <Card className="p-8 bg-card border-border/50 hover:border-border transition-colors">
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-xl font-bold text-foreground mb-2">Explainable insights</h3>
-                  <p className="text-muted-foreground leading-relaxed">
-                    Every chart has a Why button that shows the examples and sources behind an alert, so instructors can trust what they are seeing.
-                  </p>
-                </div>
-                <div className="bg-secondary/50 rounded-lg p-6 border border-border/30 relative group">
-                  <div className="flex items-end gap-2 h-24 mb-4">
-                    <div className="flex-1 bg-muted rounded-t" style={{
-                    height: '50%'
-                  }}></div>
-                    <div className="flex-1 bg-primary/70 rounded-t" style={{
-                    height: '75%'
-                  }}></div>
-                    <div className="flex-1 bg-primary rounded-t" style={{
-                    height: '90%'
-                  }}></div>
-                  </div>
-                  <p className="text-xs text-muted-foreground text-center">Question confusion trends</p>
-                  
-                </div>
-              </div>
-            </Card>
-
-            {/* Academic Integrity - Guardrails */}
-            <Card className="p-8 bg-card border-border/50 hover:border-border transition-colors">
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-xl font-bold text-foreground mb-2">Academic integrity</h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed">
-                    Built-in guardrails that block direct answers while allowing guided learning.
-                  </p>
-                </div>
-                <div className="bg-secondary/50 rounded-lg p-6 border border-border/30 space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-destructive/10 flex items-center justify-center flex-shrink-0">
-                      <X className="w-4 h-4 text-destructive" />
-                    </div>
-                    <div className="flex-1 bg-destructive/5 rounded px-3 py-2 border border-destructive/20">
-                      <p className="text-xs text-muted-foreground">"Can you just give me the answer"</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-center gap-2 py-2">
-                    
-                    
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-green-500/10 flex items-center justify-center flex-shrink-0">
-                      <Check className="w-4 h-4 text-green-600" />
-                    </div>
-                    <div className="flex-1 bg-green-500/5 rounded px-3 py-2 border border-green-500/20">
-                      <p className="text-xs text-muted-foreground">"Let's outline steps, then you try step 1"</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              </CardContent>
             </Card>
           </div>
         </div>
