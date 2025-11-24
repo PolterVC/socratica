@@ -92,63 +92,7 @@ const Landing = () => {
             </p>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-3 items-stretch max-w-6xl mx-auto">
-            {/* Teacher analytics */}
-            <Card className="h-full">
-              <CardHeader>
-                <CardTitle>Teacher analytics</CardTitle>
-                <CardDescription>
-                  See exactly where students struggle. Adjust instruction before the next class.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="h-full flex flex-col pt-0 pb-6">
-                <div className="text-sm text-muted-foreground space-y-2"></div>
-                <div className="mt-auto">
-                  <div className="rounded-2xl bg-muted h-48 md:h-56 flex items-center justify-center">
-                    <AnalyticsDonut className="h-24 w-24 md:h-28 md:w-28" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Explainable insights */}
-            <Card className="h-full">
-              <CardHeader>
-                <CardTitle>Explainable insights</CardTitle>
-                <CardDescription>
-                  Every chart has a Why button that shows sources and examples.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="h-full flex flex-col pt-0 pb-6">
-                <p className="text-sm text-muted-foreground">
-                  Trust what you are seeing with quick evidence previews.
-                </p>
-                <div className="mt-auto">
-                  <div className="rounded-2xl bg-muted h-48 md:h-56 flex items-center justify-center">
-                    <MiniBars className="h-24 w-40" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Academic integrity */}
-            <Card className="h-full">
-              <CardHeader>
-                <CardTitle>Academic integrity</CardTitle>
-                <CardDescription>
-                  Guardrails block direct answers while allowing guided learning.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="h-full flex flex-col pt-0 pb-6">
-                <p className="text-sm text-muted-foreground">No solution dumps. Citations required.</p>
-                <div className="mt-auto">
-                  <div className="rounded-2xl bg-muted h-48 md:h-56 flex items-center justify-center">
-                    <GuardrailsMock className="h-24 w-56" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          
         </div>
       </section>
 
