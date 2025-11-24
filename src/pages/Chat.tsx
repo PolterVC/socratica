@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, FormEvent } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,6 +40,7 @@ const Chat = () => {
   const [questionNumber, setQuestionNumber] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [conversationInfo, setConversationInfo] = useState<ConversationInfo | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
@@ -85,12 +86,12 @@ const Chat = () => {
       .eq("id", id)
       .maybeSingle();
 
-    if (error || !data) {
-      console.error("Error loading conversation:", error);
-      toast.error("Could not load conversation");
-      navigate("/");
-      return;
-    }
+      if (error || !data) {
+        console.error("Error loading conversation:", error);
+        toast.error("Could not load conversation");
+        navigate("/app/student");
+        return;
+      }
 
     setConversationInfo({
       course: { ...(data.courses as any), id: data.course_id },
@@ -215,7 +216,7 @@ const Chat = () => {
     <div className="min-h-screen bg-background flex flex-col">
       <header className="border-b bg-card">
         <div className="container mx-auto px-6 h-14 flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate("/")} className="shrink-0">
+          <Button variant="ghost" size="icon" onClick={() => navigate(userRole === "teacher" ? "/app/teacher" : "/app/student")} className="shrink-0">
             <ArrowLeft className="h-4 w-4" />
           </Button>
           {conversationInfo && (

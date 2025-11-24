@@ -18,15 +18,29 @@ const Auth = () => {
   const [role, setRole] = useState<"student" | "teacher">("student");
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (session) {
-        navigate("/");
+        const { data: roleData } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', session.user.id)
+          .single();
+        
+        const dashboardPath = roleData?.role === "teacher" ? "/app/teacher" : "/app/student";
+        navigate(dashboardPath);
       }
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session) {
-        navigate("/");
+        const { data: roleData } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', session.user.id)
+          .single();
+        
+        const dashboardPath = roleData?.role === "teacher" ? "/app/teacher" : "/app/student";
+        navigate(dashboardPath);
       }
     });
 
