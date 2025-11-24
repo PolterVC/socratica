@@ -158,7 +158,7 @@ const Landing = () => {
             <Card className="md:col-span-2 p-8 bg-card border-border/50 hover:border-border transition-colors">
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-2xl font-bold text-foreground mb-2">Socratic tutoring</h3>
+                  <h3 className="text-xl font-bold text-foreground mb-2">Socratic tutoring</h3>
                   <p className="text-muted-foreground leading-relaxed">
                     AI guides students through problems with targeted questions, never giving direct answers. Builds genuine understanding.
                   </p>
@@ -215,8 +215,8 @@ const Landing = () => {
                   </p>
                 </div>
                 <div className="bg-secondary/50 rounded-lg p-6 border border-border/30 relative group">
-                  <div className="flex items-center justify-center h-32">
-                    <div className="relative w-28 h-28">
+                  <div className="flex items-center justify-center h-24">
+                    <div className="relative w-20 h-20">
                       <svg viewBox="0 0 100 100" className="transform -rotate-90">
                         <circle cx="50" cy="50" r="40" fill="none" stroke="hsl(var(--muted))" strokeWidth="20" />
                         <circle cx="50" cy="50" r="40" fill="none" stroke="hsl(var(--primary))" strokeWidth="20" 
@@ -228,7 +228,7 @@ const Landing = () => {
                       </svg>
                     </div>
                   </div>
-                  <p className="text-xs text-muted-foreground text-center mt-4">Topic confusion breakdown</p>
+                  <p className="text-xs text-muted-foreground text-center mt-3">Topic confusion breakdown</p>
                   <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute inset-0 bg-background/95 rounded-lg p-4 flex flex-col justify-center gap-3">
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 rounded-full bg-primary"></div>
@@ -251,7 +251,7 @@ const Landing = () => {
             <Card className="p-8 bg-card border-border/50 hover:border-border transition-colors">
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-2xl font-bold text-foreground mb-2">Explainable insights</h3>
+                  <h3 className="text-xl font-bold text-foreground mb-2">Explainable insights</h3>
                   <p className="text-muted-foreground leading-relaxed">
                     Every chart has a Why button that shows the examples and sources behind an alert, so instructors can trust what they are seeing.
                   </p>
@@ -263,6 +263,7 @@ const Landing = () => {
                     <div className="flex-1 bg-primary rounded-t" style={{ height: '90%' }}></div>
                   </div>
                   <Badge className="absolute top-4 right-4 text-xs">Why</Badge>
+                  <p className="text-xs text-muted-foreground text-center">Question confusion trends</p>
                   <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute inset-0 bg-background/95 rounded-lg p-4 flex flex-col gap-2">
                     <p className="text-xs text-muted-foreground italic">"I'm confused about the equilibrium..."</p>
                     <p className="text-xs text-muted-foreground italic">"Why does the curve shift left?"</p>
