@@ -215,7 +215,7 @@ const Landing = () => {
                   </p>
                 </div>
                 <div className="bg-secondary/50 rounded-lg p-6 border border-border/30 relative group">
-                  <div className="flex items-center justify-center h-24">
+                  <div className="flex items-end justify-center h-24 mb-4">
                     <div className="relative w-20 h-20">
                       <svg viewBox="0 0 100 100" className="transform -rotate-90">
                         <circle cx="50" cy="50" r="40" fill="none" stroke="hsl(var(--muted))" strokeWidth="20" />
@@ -228,7 +228,7 @@ const Landing = () => {
                       </svg>
                     </div>
                   </div>
-                  <p className="text-xs text-muted-foreground text-center mt-3">Topic confusion breakdown</p>
+                  <p className="text-xs text-muted-foreground text-center">Topic confusion breakdown</p>
                   <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute inset-0 bg-background/95 rounded-lg p-4 flex flex-col justify-center gap-3">
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 rounded-full bg-primary"></div>
