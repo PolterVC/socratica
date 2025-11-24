@@ -464,13 +464,20 @@ const CoursesTab = ({ userId }: { userId: string }) => {
                 </div>
               </CardHeader>
               <CardContent>
-                {courseAssignments.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">
-                    No assignments yet
-                  </p>
-                ) : (
-                  <div className="space-y-2">
-                    {courseAssignments.map((assignment) => (
+                <Tabs defaultValue="assignments" className="w-full">
+                  <TabsList>
+                    <TabsTrigger value="assignments">Assignments</TabsTrigger>
+                    <TabsTrigger value="materials">Materials</TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="assignments" className="mt-4">
+                    {courseAssignments.length === 0 ? (
+                      <p className="text-sm text-muted-foreground">
+                        No assignments yet
+                      </p>
+                    ) : (
+                      <div className="space-y-2">
+                        {courseAssignments.map((assignment) => (
                       <Card key={assignment.id}>
                         <CardHeader>
                           <CardTitle className="text-lg flex justify-between items-start">
@@ -515,9 +522,15 @@ const CoursesTab = ({ userId }: { userId: string }) => {
                           </Tabs>
                         </CardContent>
                       </Card>
-                    ))}
-                  </div>
-                )}
+                        ))}
+                      </div>
+                    )}
+                  </TabsContent>
+                  
+                  <TabsContent value="materials" className="mt-4">
+                    <MaterialsTab courseId={course.id} />
+                  </TabsContent>
+                </Tabs>
               </CardContent>
             </Card>
           );

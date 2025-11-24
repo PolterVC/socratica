@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileText, Download } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { FileText, Download, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 
 interface MaterialsListProps {
@@ -14,6 +15,7 @@ interface Material {
   id: string;
   title: string;
   kind: string;
+  text_extracted: boolean;
   downloadUrl: string | null;
 }
 
@@ -39,7 +41,7 @@ const MaterialsList = ({ courseId, assignmentId }: MaterialsListProps) => {
       if (!response.ok) throw new Error("Failed to load materials");
 
       const data = await response.json();
-      setMaterials(data);
+      setMaterials(data.items || []);
     } catch (err) {
       console.error("Load materials error:", err);
       toast.error("Failed to load materials");
@@ -76,9 +78,17 @@ const MaterialsList = ({ courseId, assignmentId }: MaterialsListProps) => {
             <div className="flex items-center gap-2 min-w-0 flex-1">
               <FileText className="w-4 h-4 text-muted-foreground shrink-0" />
               <div className="min-w-0 flex-1">
-                <p className="font-medium truncate">{material.title}</p>
-                <p className="text-xs text-muted-foreground capitalize">
-                  {material.kind}
+                <div className="flex items-center gap-2">
+                  <p className="font-medium truncate">{material.title}</p>
+                  {material.text_extracted && (
+                    <Badge variant="default" className="gap-1 h-5 text-xs px-1.5">
+                      <CheckCircle2 className="w-3 h-3" />
+                      Ready
+                    </Badge>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {material.kind.replace(/_/g, " ")}
                 </p>
               </div>
             </div>
