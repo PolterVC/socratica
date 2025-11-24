@@ -214,11 +214,32 @@ Set confidence 0.0 to 1.0 based on how well the context matches the student's qu
     }
 
     const json = await resp.json();
-    const content = json?.choices?.[0]?.message?.content;
+    let content = json?.choices?.[0]?.message?.content || "";
+
+    // Strip markdown code fences if present
+    content = content.replace(/^```(?:json)?\s*\n?/i, "").replace(/\n?```\s*$/i, "");
+    content = content.trim();
 
     let out;
     try {
       out = JSON.parse(content);
+      
+      // Ensure tutor_reply is clean text without nested JSON
+      if (out.tutor_reply && typeof out.tutor_reply === "string") {
+        // Check if tutor_reply accidentally contains JSON structure
+        const jsonPattern = /^\s*\{[\s\S]*"tutor_reply"\s*:\s*"[\s\S]*"\s*,\s*"metadata"\s*:\s*\{[\s\S]*\}\s*\}\s*$/;
+        if (jsonPattern.test(out.tutor_reply)) {
+          // LLM returned JSON inside JSON, try to parse the inner structure
+          try {
+            const innerParsed = JSON.parse(out.tutor_reply);
+            if (innerParsed.tutor_reply) {
+              out = innerParsed;
+            }
+          } catch {
+            // If inner parsing fails, just use the outer structure
+          }
+        }
+      }
     } catch {
       out = {
         tutor_reply: content || "Let us start from the assignment. What part do you want to focus on first?",
