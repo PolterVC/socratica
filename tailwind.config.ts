@@ -11,6 +11,10 @@ export default {
   ],
   prefix: "",
   theme: {
+    fontFamily: {
+      sans: ['Inter', 'system-ui', 'sans-serif'],
+      serif: ['Playfair Display', 'Georgia', 'serif'],
+    },
     container: {
       center: true,
       padding: '2rem',
