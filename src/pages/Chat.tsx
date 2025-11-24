@@ -295,7 +295,7 @@ const Chat = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="h-screen bg-background flex flex-col">
       <header className="border-b border-border/10 bg-white sticky top-0 z-10 shadow-sm">
         <div className="container mx-auto px-6 h-16 flex items-center gap-4">
           <Button 
@@ -317,7 +317,7 @@ const Chat = () => {
         </div>
       </header>
 
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 h-[calc(100vh-64px)] overflow-hidden">
         {isMobile ? (
           <Tabs defaultValue="chat" className="h-full flex flex-col">
             <TabsList className="w-full justify-start px-6 pt-4">
