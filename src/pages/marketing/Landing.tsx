@@ -353,8 +353,8 @@ const Landing = () => {
             <div className="space-y-4">
               <h4 className="font-semibold text-foreground">Connect</h4>
               <div className="space-y-3 text-sm">
-                <a href="mailto:support@socratica.app" className="block text-muted-foreground hover:text-foreground transition-colors">
-                  support@socratica.app
+                <a href="mailto:eli.polterovich@mail.mcgill.ca" className="block text-muted-foreground hover:text-foreground transition-colors">
+                  eli.polterovich@mail.mcgill.ca
                 </a>
               </div>
             </div>
