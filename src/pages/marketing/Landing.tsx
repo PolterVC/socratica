@@ -94,9 +94,9 @@ const Landing = () => {
             </p>
           </div>
 
-          <div className="max-w-6xl mx-auto space-y-24">
+          <div className="max-w-7xl mx-auto space-y-32">
             {/* Analytics Dashboard */}
-            <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="grid md:grid-cols-2 gap-16 items-center">
               <div className="space-y-4">
                 <h3 className="font-serif text-3xl font-bold text-foreground">
                   See where students struggle
@@ -115,7 +115,7 @@ const Landing = () => {
             </div>
 
             {/* Chat Interface */}
-            <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="grid md:grid-cols-2 gap-16 items-center">
               <div className="order-2 md:order-1 rounded-lg overflow-hidden border border-border shadow-lg bg-background">
                 <img 
                   src={chatScreenshot} 
