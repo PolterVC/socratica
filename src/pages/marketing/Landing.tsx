@@ -214,7 +214,7 @@ const Landing = () => {
                     See exactly where students struggle. Adjust instruction before the next class.
                   </p>
                 </div>
-                <div className="bg-secondary/50 rounded-lg p-6 border border-border/30 relative group">
+                <div className="bg-secondary/50 rounded-lg p-6 border border-border/30 relative group mt-2">
                   <div className="flex items-center justify-center h-24 mb-4">
                     <div className="relative w-20 h-20">
                       <svg viewBox="0 0 100 100" className="transform -rotate-90">
