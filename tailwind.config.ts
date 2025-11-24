@@ -106,6 +106,10 @@ export default {
         'slide-out': {
           from: { transform: 'translateX(0)' },
           to: { transform: 'translateX(-100%)' }
+        },
+        'scroll': {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(-50%)' }
         }
       },
       animation: {
@@ -114,7 +118,8 @@ export default {
         'fade-in': 'fade-in 0.2s ease-out',
         'fade-out': 'fade-out 0.2s ease-out',
         'slide-in': 'slide-in 0.3s ease-out',
-        'slide-out': 'slide-out 0.3s ease-out'
+        'slide-out': 'slide-out 0.3s ease-out',
+        'scroll': 'scroll 30s linear infinite'
       }
     }
   },
