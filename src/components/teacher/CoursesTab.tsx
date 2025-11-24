@@ -149,6 +149,9 @@ const CoursesTab = ({ userId }: { userId: string }) => {
                 courseId: selectedCourse,
                 assignmentId: assignment.id,
                 filename: assignmentFile.name,
+                title: assignmentFile.name.replace(/\.pdf$/i, "") || assignmentTitle,
+                kind: "questions",
+                fileSize: assignmentFile.size,
               },
             });
 
@@ -167,30 +170,13 @@ const CoursesTab = ({ userId }: { userId: string }) => {
             throw new Error("Assignment file upload failed");
           }
 
-          const { data: materialData, error: materialError } =
-            await supabase.functions.invoke("materials", {
-              method: "POST",
-              body: {
-                courseId: selectedCourse,
-                assignmentId: assignment.id,
-                title:
-                  assignmentFile.name.replace(/\.pdf$/i, "") ||
-                  `${assignmentTitle} file`,
-                // Default to questions + answers for files attached at creation
-                kind: "questions_with_answers",
-                storagePath: uploadData.storagePath,
-              },
-            });
-
-          if (materialError) throw materialError;
-
           const { chunks } = await extractTextFromPDF(assignmentFile);
 
           const { error: textError } = await supabase.functions.invoke(
             "materials-text",
             {
               body: {
-                materialId: materialData.id,
+                materialId: uploadData.materialId,
                 chunks,
               },
             }
