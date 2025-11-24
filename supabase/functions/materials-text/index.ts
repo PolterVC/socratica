@@ -1,122 +1,50 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const corsHeaders = {
+const cors = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
-
+  if (req.method === "OPTIONS") return new Response(null, { headers: cors });
   try {
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
-
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    if (req.method !== "POST") {
+      return new Response(JSON.stringify({ error: "Method not allowed" }), { status: 405, headers: { ...cors, "Content-Type": "application/json" } });
     }
 
-    const token = authHeader.replace("Bearer ", "");
-    const { data: userData, error: userError } = await supabase.auth.getUser(token);
-    if (userError || !userData.user) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    const url = Deno.env.get("SUPABASE_URL")!;
+    const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const admin = createClient(url, key);
+
+    const auth = req.headers.get("Authorization") || "";
+    const token = auth.replace("Bearer ", "");
+    const { data: u } = await admin.auth.getUser(token);
+    const uid = u?.user?.id;
+    if (!uid) return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...cors, "Content-Type": "application/json" } });
+
+    const { materialId, chunks } = await req.json();
+    if (!materialId || !Array.isArray(chunks) || chunks.length === 0) {
+      return new Response(JSON.stringify({ error: "materialId and chunks required" }), { status: 400, headers: { ...cors, "Content-Type": "application/json" } });
     }
 
-    const userId = userData.user.id;
-
-    if (req.method === "POST") {
-      const { materialId, chunks } = await req.json();
-
-      if (!materialId || !chunks || !Array.isArray(chunks)) {
-        return new Response(
-          JSON.stringify({ error: "materialId and chunks array required" }),
-          {
-            status: 400,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          }
-        );
-      }
-
-      // Verify user owns the material
-      const { data: material } = await supabase
-        .from("materials")
-        .select("created_by")
-        .eq("id", materialId)
-        .maybeSingle();
-
-      if (!material || material.created_by !== userId) {
-        return new Response(JSON.stringify({ error: "Not authorized" }), {
-          status: 403,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-
-      // Insert chunks
-      const chunkRecords = chunks.map((content, index) => ({
-        material_id: materialId,
-        chunk_index: index,
-        content,
-      }));
-
-      const { error: insertError } = await supabase
-        .from("material_text")
-        .insert(chunkRecords);
-
-      if (insertError) {
-        console.error("Insert chunks error:", insertError);
-        return new Response(JSON.stringify({ error: "Failed to insert chunks" }), {
-          status: 500,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-
-      // Update tsv column for full text search
-      const { error: updateError } = await supabase.rpc("update_material_text_tsv", {
-        mat_id: materialId,
-      });
-
-      if (updateError) {
-        console.error("Update tsv error:", updateError);
-      }
-
-      // Mark material as extracted
-      await supabase
-        .from("materials")
-        .update({ text_extracted: true })
-        .eq("id", materialId);
-
-      return new Response(
-        JSON.stringify({ success: true, chunksInserted: chunks.length }),
-        {
-          status: 200,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
-      );
+    const { data: mat } = await admin.from("materials").select("id, created_by").eq("id", materialId).maybeSingle();
+    if (!mat || mat.created_by !== uid) {
+      return new Response(JSON.stringify({ error: "Not authorized" }), { status: 403, headers: { ...cors, "Content-Type": "application/json" } });
     }
 
-    return new Response(JSON.stringify({ error: "Method not allowed" }), {
-      status: 405,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-  } catch (err) {
-    console.error("materials-text error:", err);
-    return new Response(
-      JSON.stringify({ error: err instanceof Error ? err.message : "Unknown error" }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
-    );
+    const rows = chunks.map((c: string, i: number) => ({ material_id: materialId, chunk_index: i, content: c }));
+    const { error: insErr } = await admin.from("material_text").insert(rows);
+    if (insErr) {
+      console.error("Insert chunks error:", insErr);
+      return new Response(JSON.stringify({ error: "Could not save chunks" }), { status: 500, headers: { ...cors, "Content-Type": "application/json" } });
+    }
+
+    await admin.from("materials").update({ text_extracted: true }).eq("id", materialId);
+
+    return new Response(JSON.stringify({ ok: true }), { status: 200, headers: { ...cors, "Content-Type": "application/json" } });
+  } catch (e) {
+    console.error("materials-text error", e);
+    return new Response(JSON.stringify({ error: "Server error" }), { status: 500, headers: { ...cors, "Content-Type": "application/json" } });
   }
 });

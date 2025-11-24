@@ -1,109 +1,81 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
+import { Download, FileText, CheckCircle, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { FileText, Download, CheckCircle2 } from "lucide-react";
-import { toast } from "sonner";
 
-interface MaterialsListProps {
-  courseId: string;
-  assignmentId: string;
-}
-
-interface Material {
+type MaterialItem = {
   id: string;
   title: string;
   kind: string;
+  file_size: number | null;
   text_extracted: boolean;
+  created_at: string;
   downloadUrl: string | null;
-}
-
-const MaterialsList = ({ courseId, assignmentId }: MaterialsListProps) => {
-  const [materials, setMaterials] = useState<Material[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    loadMaterials();
-  }, [courseId, assignmentId]);
-
-  const loadMaterials = async () => {
-    try {
-      const params = new URLSearchParams({ courseId, assignmentId });
-      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/materials?${params}`;
-      
-      const response = await fetch(url, {
-        headers: {
-          Authorization: `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
-        },
-      });
-
-      if (!response.ok) throw new Error("Failed to load materials");
-
-      const data = await response.json();
-      setMaterials(data.items || []);
-    } catch (err) {
-      console.error("Load materials error:", err);
-      toast.error("Failed to load materials");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="text-sm text-muted-foreground">
-        Loading materials...
-      </div>
-    );
-  }
-
-  if (materials.length === 0) {
-    return (
-      <div className="text-sm text-muted-foreground">
-        No materials available
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-2">
-      <h3 className="text-sm font-medium">Course Materials</h3>
-      <div className="space-y-1.5">
-        {materials.map((material) => (
-          <div
-            key={material.id}
-            className="flex items-center justify-between gap-2 text-sm"
-          >
-            <div className="flex items-center gap-2 min-w-0 flex-1">
-              <FileText className="w-4 h-4 text-muted-foreground shrink-0" />
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
-                  <p className="font-medium truncate">{material.title}</p>
-                  {material.text_extracted && (
-                    <Badge variant="default" className="gap-1 h-5 text-xs px-1.5">
-                      <CheckCircle2 className="w-3 h-3" />
-                      Ready
-                    </Badge>
-                  )}
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  {material.kind.replace(/_/g, " ")}
-                </p>
-              </div>
-            </div>
-            {material.downloadUrl && (
-              <Button size="sm" variant="ghost" asChild className="shrink-0 h-8 px-2">
-                <a href={material.downloadUrl} download>
-                  <Download className="w-3.5 h-3.5" />
-                </a>
-              </Button>
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
 };
 
-export default MaterialsList;
+export default function MaterialsList({ courseId, assignmentId }: { courseId: string; assignmentId?: string | null }) {
+  const [items, setItems] = useState<MaterialItem[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  async function load() {
+    setLoading(true);
+    try {
+      const token = (await supabase.auth.getSession()).data.session?.access_token || "";
+      const params = new URLSearchParams({ courseId });
+      if (assignmentId) params.append("assignmentId", assignmentId);
+      
+      const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/materials?${params}`, {
+        headers: { Authorization: token ? `Bearer ${token}` : "" }
+      });
+      const json = await res.json();
+      setItems(json.items || []);
+    } catch (e) {
+      console.error(e);
+    } finally { 
+      setLoading(false); 
+    }
+  }
+
+  useEffect(() => { load(); }, [courseId, assignmentId]);
+
+  if (loading) return <div className="text-sm text-muted-foreground">Loading materials…</div>;
+  if (!items.length) return <div className="text-sm text-muted-foreground">No materials available</div>;
+
+  return (
+    <div className="space-y-3">
+      <h3 className="font-medium text-sm">Course Materials</h3>
+      {items.map((m) => (
+        <Card key={m.id} className="px-3 py-2">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <FileText className="w-4 h-4 shrink-0" />
+              <div className="min-w-0 flex-1">
+                <div className="font-medium text-sm truncate">{m.title}</div>
+                <div className="text-xs text-muted-foreground">
+                  {m.kind.replace(/_/g, " ")} • {m.file_size ? `${(m.file_size / (1024 * 1024)).toFixed(1)} MB` : "Unknown size"}
+                </div>
+              </div>
+              {m.text_extracted ? (
+                <span className="inline-flex items-center text-green-600 text-xs shrink-0">
+                  <CheckCircle className="w-3 h-3 mr-1" /> Ready
+                </span>
+              ) : (
+                <span className="inline-flex items-center text-amber-600 text-xs shrink-0">
+                  <Clock className="w-3 h-3 mr-1" /> Processing
+                </span>
+              )}
+            </div>
+            {m.downloadUrl && (
+              <a href={m.downloadUrl} target="_blank" rel="noreferrer">
+                <Button size="sm" variant="ghost" className="shrink-0">
+                  <Download className="w-4 h-4" />
+                </Button>
+              </a>
+            )}
+          </div>
+        </Card>
+      ))}
+    </div>
+  );
+}
