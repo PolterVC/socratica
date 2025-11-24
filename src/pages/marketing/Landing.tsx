@@ -8,6 +8,7 @@ import mcgillLogo from "@/assets/mcgill-logo.png";
 import udemLogo from "@/assets/udem-logo.png";
 import lavalLogo from "@/assets/laval-logo.png";
 import uoftLogo from "@/assets/uoft-logo.png";
+import concordiaLogo from "@/assets/concordia-logo.png";
 
 const Landing = () => {
   const [user, setUser] = useState<any>(null);
@@ -62,15 +63,24 @@ const Landing = () => {
 
       {/* University Logos */}
       <section className="border-y bg-card overflow-hidden">
-        <div className="container mx-auto px-6 py-12">
-          <h3 className="text-center text-lg font-medium text-muted-foreground mb-8">
+        <div className="container mx-auto px-6 py-16">
+          <h3 className="text-center text-lg font-medium text-muted-foreground mb-12">
             Tested by professors from these universities
           </h3>
-          <div className="flex items-center justify-center gap-12 md:gap-16 flex-wrap">
-            <img src={mcgillLogo} alt="McGill University" className="h-12 object-contain opacity-70 hover:opacity-100 transition-opacity grayscale hover:grayscale-0" />
-            <img src={udemLogo} alt="Université de Montréal" className="h-12 object-contain opacity-70 hover:opacity-100 transition-opacity grayscale hover:grayscale-0" />
-            <img src={lavalLogo} alt="Université Laval" className="h-12 object-contain opacity-70 hover:opacity-100 transition-opacity grayscale hover:grayscale-0" />
-            <img src={uoftLogo} alt="University of Toronto" className="h-12 object-contain opacity-70 hover:opacity-100 transition-opacity grayscale hover:grayscale-0" />
+          <div className="relative">
+            <div className="flex animate-[scroll_30s_linear_infinite] gap-16 md:gap-24">
+              <img src={mcgillLogo} alt="McGill University" className="h-20 object-contain opacity-80 hover:opacity-100 transition-opacity" />
+              <img src={udemLogo} alt="Université de Montréal" className="h-20 object-contain opacity-80 hover:opacity-100 transition-opacity" />
+              <img src={lavalLogo} alt="Université Laval" className="h-20 object-contain opacity-80 hover:opacity-100 transition-opacity" />
+              <img src={uoftLogo} alt="University of Toronto" className="h-20 object-contain opacity-80 hover:opacity-100 transition-opacity" />
+              <img src={concordiaLogo} alt="Concordia University" className="h-20 object-contain opacity-80 hover:opacity-100 transition-opacity" />
+              {/* Duplicate for seamless loop */}
+              <img src={mcgillLogo} alt="McGill University" className="h-20 object-contain opacity-80 hover:opacity-100 transition-opacity" />
+              <img src={udemLogo} alt="Université de Montréal" className="h-20 object-contain opacity-80 hover:opacity-100 transition-opacity" />
+              <img src={lavalLogo} alt="Université Laval" className="h-20 object-contain opacity-80 hover:opacity-100 transition-opacity" />
+              <img src={uoftLogo} alt="University of Toronto" className="h-20 object-contain opacity-80 hover:opacity-100 transition-opacity" />
+              <img src={concordiaLogo} alt="Concordia University" className="h-20 object-contain opacity-80 hover:opacity-100 transition-opacity" />
+            </div>
           </div>
         </div>
       </section>
