@@ -11,7 +11,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { Send, ArrowLeft, FileText } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { toast } from "sonner";
 
 interface Message {
@@ -46,6 +48,7 @@ const Chat = () => {
   const [selectedPdfIndex, setSelectedPdfIndex] = useState(0);
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const isMobile = useIsMobile();
 
   // scroll
   const scrollToBottom = () => {
@@ -315,162 +318,318 @@ const Chat = () => {
       </header>
 
       <div className="flex-1 overflow-hidden">
-        <Tabs defaultValue="assignment" className="h-full flex flex-col">
-          <TabsList className="w-full justify-start px-6 pt-4 bg-white border-b">
-            <TabsTrigger value="assignment">Assignment</TabsTrigger>
-            <TabsTrigger value="chat">Chat</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="assignment" className="flex-1 overflow-hidden mt-0">
-            <div className="h-full p-6 flex flex-col">
-              {availablePdfs.length > 1 && (
-                <Select 
-                  value={selectedPdfIndex.toString()} 
-                  onValueChange={(val) => {
-                    const idx = parseInt(val);
-                    setSelectedPdfIndex(idx);
-                    setPdfUrl(availablePdfs[idx].url);
-                  }}
-                  disabled={loadingPdf}
-                >
-                  <SelectTrigger className="w-full max-w-md mb-4">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {availablePdfs.map((pdf, idx) => (
-                      <SelectItem key={pdf.id} value={idx.toString()}>
-                        {pdf.title}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-              {loadingPdf ? (
-                <div className="flex-1 flex items-center justify-center">
-                  <p className="text-muted-foreground">Loading assignment PDF...</p>
-                </div>
-              ) : pdfUrl ? (
-                <iframe src={pdfUrl} className="flex-1 w-full border rounded-lg" title="Assignment PDF" />
-              ) : (
-                <div className="flex-1 flex items-center justify-center">
-                  <div className="text-center space-y-2">
-                    <FileText className="w-12 h-12 mx-auto text-muted-foreground/40" />
-                    <p className="text-muted-foreground">No assignment PDF available</p>
-                  </div>
-                </div>
-              )}
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="chat" className="flex-1 overflow-hidden mt-0">
-            <div className="h-full flex flex-col px-6 py-6 max-w-5xl mx-auto">
-              <div className="flex-1 overflow-y-auto pr-2 space-y-1">
-                {messages.length === 0 && !loading ? (
-                  <div className="h-full flex items-center justify-center">
-                    <div className="text-center max-w-lg space-y-2">
-                      <p className="text-foreground/60 text-base leading-relaxed">
-                        Ask a question about the assignment.
-                      </p>
-                      <p className="text-foreground/40 text-sm">
-                        The tutor will guide you through thinking, not give you the answer.
-                      </p>
+        {isMobile ? (
+          <Tabs defaultValue="chat" className="h-full flex flex-col">
+            <TabsList className="w-full justify-start px-6 pt-4">
+              <TabsTrigger value="chat">Chat</TabsTrigger>
+              <TabsTrigger value="assignment">Assignment</TabsTrigger>
+            </TabsList>
+            <TabsContent value="chat" className="flex-1 overflow-hidden mt-0">
+              <div className="h-full flex flex-col px-6 py-6">
+                <div className="flex-1 overflow-y-auto pr-2 space-y-1">
+                  {messages.length === 0 && !loading ? (
+                    <div className="h-full flex items-center justify-center">
+                      <div className="text-center max-w-lg space-y-2">
+                        <p className="text-foreground/60 text-base leading-relaxed">
+                          Ask a question about the assignment.
+                        </p>
+                        <p className="text-foreground/40 text-sm">
+                          The tutor will guide you through thinking, not give you the answer.
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                ) : (
-                  <div className="space-y-6">
-                    {messages.map((message) => (
-                      <div key={message.id}>
-                        <div
-                          className={`flex ${
-                            message.sender === "student" ? "justify-end" : "justify-start"
-                          }`}
-                        >
+                  ) : (
+                    <div className="space-y-6">
+                      {messages.map((message) => (
+                        <div key={message.id}>
                           <div
-                            className={`max-w-[75%] rounded-xl px-5 py-4 ${
-                              message.sender === "student"
-                                ? "bg-primary text-primary-foreground shadow-sm"
-                                : "bg-muted/50 border border-border/20"
+                            className={`flex ${
+                              message.sender === "student" ? "justify-end" : "justify-start"
                             }`}
                           >
-                            <p className="whitespace-pre-wrap leading-relaxed text-[15px]">{message.text}</p>
-                            {message.sender === "tutor" && message.materials_referenced && message.materials_referenced.length > 0 && (
-                              <div className="mt-4 pt-4 border-t border-border/20">
-                                <p className="text-xs font-medium mb-2.5 text-foreground/50 uppercase tracking-wide">Referenced materials</p>
-                                <div className="flex flex-wrap gap-2">
-                                  {message.materials_referenced.map((mat, idx) => (
-                                    <span
-                                      key={idx}
-                                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs bg-background border border-border/30"
-                                    >
-                                      <span className="text-foreground/40 font-medium">{mat.kind}</span>
-                                      <span className="text-foreground/70">{mat.title}</span>
-                                    </span>
-                                  ))}
+                            <div
+                              className={`max-w-[75%] rounded-xl px-5 py-4 ${
+                                message.sender === "student"
+                                  ? "bg-primary text-primary-foreground shadow-sm"
+                                  : "bg-muted/50 border border-border/20"
+                              }`}
+                            >
+                              <p className="whitespace-pre-wrap leading-relaxed text-[15px]">{message.text}</p>
+                              {message.sender === "tutor" && message.materials_referenced && message.materials_referenced.length > 0 && (
+                                <div className="mt-4 pt-4 border-t border-border/20">
+                                  <p className="text-xs font-medium mb-2.5 text-foreground/50 uppercase tracking-wide">Referenced materials</p>
+                                  <div className="flex flex-wrap gap-2">
+                                    {message.materials_referenced.map((mat, idx) => (
+                                      <span
+                                        key={idx}
+                                        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs bg-background border border-border/30"
+                                      >
+                                        <span className="text-foreground/40 font-medium">{mat.kind}</span>
+                                        <span className="text-foreground/70">{mat.title}</span>
+                                      </span>
+                                    ))}
+                                  </div>
                                 </div>
-                              </div>
-                            )}
+                              )}
+                            </div>
+                          </div>
+                          {message.sender === "student" && (
+                            <p className="text-[11px] text-foreground/30 mt-2 text-right mr-1 uppercase tracking-wider">
+                              Logged for instructor insight
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                      {loading && (
+                        <div className="flex justify-start">
+                          <div className="bg-muted/50 border border-border/20 rounded-xl px-5 py-4">
+                            <div className="flex space-x-1.5">
+                              <div className="w-2 h-2 bg-foreground/40 rounded-full animate-bounce" />
+                              <div
+                                className="w-2 h-2 bg-foreground/40 rounded-full animate-bounce"
+                                style={{ animationDelay: "0.15s" }}
+                              />
+                              <div
+                                className="w-2 h-2 bg-foreground/40 rounded-full animate-bounce"
+                                style={{ animationDelay: "0.3s" }}
+                              />
+                            </div>
                           </div>
                         </div>
-                        {message.sender === "student" && (
-                          <p className="text-[11px] text-foreground/30 mt-2 text-right mr-1 uppercase tracking-wider">
-                            Logged for instructor insight
-                          </p>
-                        )}
-                      </div>
-                    ))}
-                    {loading && (
-                      <div className="flex justify-start">
-                        <div className="bg-muted/50 border border-border/20 rounded-xl px-5 py-4">
-                          <div className="flex space-x-1.5">
-                            <div className="w-2 h-2 bg-foreground/40 rounded-full animate-bounce" />
-                            <div
-                              className="w-2 h-2 bg-foreground/40 rounded-full animate-bounce"
-                              style={{ animationDelay: "0.15s" }}
-                            />
-                            <div
-                              className="w-2 h-2 bg-foreground/40 rounded-full animate-bounce"
-                              style={{ animationDelay: "0.3s" }}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                    <div ref={messagesEndRef} />
-                  </div>
-                )}
-              </div>
+                      )}
+                      <div ref={messagesEndRef} />
+                    </div>
+                  )}
+                </div>
 
-              <div className="shrink-0 bg-background pt-6 border-t border-border/10">
-                <form onSubmit={sendMessage} className="flex gap-3">
-                  <Select value={questionNumber} onValueChange={setQuestionNumber}>
-                    <SelectTrigger className="w-32 shrink-0 bg-white border-border/20 font-medium">
-                      <SelectValue placeholder="Question" />
+                <div className="shrink-0 bg-background pt-6 border-t border-border/10">
+                  <form onSubmit={sendMessage} className="flex gap-3">
+                    <Select value={questionNumber} onValueChange={setQuestionNumber}>
+                      <SelectTrigger className="w-32 shrink-0 bg-white border-border/20 font-medium">
+                        <SelectValue placeholder="Question" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">General</SelectItem>
+                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+                          <SelectItem key={n} value={n.toString()}>
+                            Q{n}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+
+                    <Input
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      placeholder="Type your question..."
+                      className="flex-1 bg-white border-border/20 h-11 text-[15px]"
+                      disabled={loading}
+                    />
+                    <Button type="submit" disabled={loading || !input.trim()} className="shrink-0 h-11 px-5">
+                      <Send className="w-4 h-4" />
+                    </Button>
+                  </form>
+                </div>
+              </div>
+            </TabsContent>
+            <TabsContent value="assignment" className="flex-1 overflow-hidden mt-0">
+              <div className="h-full p-6 flex flex-col">
+                {availablePdfs.length > 1 && (
+                  <Select 
+                    value={selectedPdfIndex.toString()} 
+                    onValueChange={(val) => {
+                      const idx = parseInt(val);
+                      setSelectedPdfIndex(idx);
+                      setPdfUrl(availablePdfs[idx].url);
+                    }}
+                    disabled={loadingPdf}
+                  >
+                    <SelectTrigger className="w-full mb-4">
+                      <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="none">General</SelectItem>
-                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
-                        <SelectItem key={n} value={n.toString()}>
-                          Q{n}
+                      {availablePdfs.map((pdf, idx) => (
+                        <SelectItem key={pdf.id} value={idx.toString()}>
+                          {pdf.title}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-
-                  <Input
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    placeholder="Type your question..."
-                    className="flex-1 bg-white border-border/20 h-11 text-[15px]"
-                    disabled={loading}
-                  />
-                  <Button type="submit" disabled={loading || !input.trim()} className="shrink-0 h-11 px-5">
-                    <Send className="w-4 h-4" />
-                  </Button>
-                </form>
+                )}
+                {loadingPdf ? (
+                  <div className="flex-1 flex items-center justify-center">
+                    <p className="text-muted-foreground">Loading assignment PDF...</p>
+                  </div>
+                ) : pdfUrl ? (
+                  <iframe src={pdfUrl} className="flex-1 w-full border rounded-lg" title="Assignment PDF" />
+                ) : (
+                  <div className="flex-1 flex items-center justify-center">
+                    <div className="text-center space-y-2">
+                      <FileText className="w-12 h-12 mx-auto text-muted-foreground/40" />
+                      <p className="text-muted-foreground">No assignment PDF available</p>
+                    </div>
+                  </div>
+                )}
               </div>
-            </div>
-          </TabsContent>
-        </Tabs>
+            </TabsContent>
+          </Tabs>
+        ) : (
+          <ResizablePanelGroup direction="horizontal" className="h-full">
+            <ResizablePanel defaultSize={50} minSize={30}>
+              <div className="h-full flex flex-col">
+                <div className="shrink-0 flex items-center justify-between px-6 py-4 border-b border-border/10 bg-white">
+                  <h2 className="text-lg font-semibold">Assignment</h2>
+                  {availablePdfs.length > 1 && (
+                    <Select 
+                      value={selectedPdfIndex.toString()} 
+                      onValueChange={(val) => {
+                        const idx = parseInt(val);
+                        setSelectedPdfIndex(idx);
+                        setPdfUrl(availablePdfs[idx].url);
+                      }}
+                    >
+                      <SelectTrigger className="w-64">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {availablePdfs.map((pdf, idx) => (
+                          <SelectItem key={pdf.id} value={idx.toString()}>
+                            {pdf.title}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
+                {loadingPdf ? (
+                  <div className="flex-1 flex items-center justify-center">
+                    <p className="text-muted-foreground">Loading PDF...</p>
+                  </div>
+                ) : pdfUrl ? (
+                  <iframe src={pdfUrl} className="flex-1 w-full" title="Assignment PDF" />
+                ) : (
+                  <div className="flex-1 flex items-center justify-center">
+                    <div className="text-center space-y-2">
+                      <FileText className="w-12 h-12 mx-auto text-muted-foreground/40" />
+                      <p className="text-muted-foreground">No assignment PDF available</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </ResizablePanel>
+            
+            <ResizableHandle withHandle />
+            
+            <ResizablePanel defaultSize={50} minSize={30}>
+              <div className="h-full flex flex-col px-6 py-6">
+                <div className="flex-1 overflow-y-auto pr-2 space-y-1">
+                  {messages.length === 0 && !loading ? (
+                    <div className="h-full flex items-center justify-center">
+                      <div className="text-center max-w-lg space-y-2">
+                        <p className="text-foreground/60 text-base leading-relaxed">
+                          Ask a question about the assignment.
+                        </p>
+                        <p className="text-foreground/40 text-sm">
+                          The tutor will guide you through thinking, not give you the answer.
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-6">
+                      {messages.map((message) => (
+                        <div key={message.id}>
+                          <div
+                            className={`flex ${
+                              message.sender === "student" ? "justify-end" : "justify-start"
+                            }`}
+                          >
+                            <div
+                              className={`max-w-[75%] rounded-xl px-5 py-4 ${
+                                message.sender === "student"
+                                  ? "bg-primary text-primary-foreground shadow-sm"
+                                  : "bg-muted/50 border border-border/20"
+                              }`}
+                            >
+                              <p className="whitespace-pre-wrap leading-relaxed text-[15px]">{message.text}</p>
+                              {message.sender === "tutor" && message.materials_referenced && message.materials_referenced.length > 0 && (
+                                <div className="mt-4 pt-4 border-t border-border/20">
+                                  <p className="text-xs font-medium mb-2.5 text-foreground/50 uppercase tracking-wide">Referenced materials</p>
+                                  <div className="flex flex-wrap gap-2">
+                                    {message.materials_referenced.map((mat, idx) => (
+                                      <span
+                                        key={idx}
+                                        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs bg-background border border-border/30"
+                                      >
+                                        <span className="text-foreground/40 font-medium">{mat.kind}</span>
+                                        <span className="text-foreground/70">{mat.title}</span>
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          {message.sender === "student" && (
+                            <p className="text-[11px] text-foreground/30 mt-2 text-right mr-1 uppercase tracking-wider">
+                              Logged for instructor insight
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                      {loading && (
+                        <div className="flex justify-start">
+                          <div className="bg-muted/50 border border-border/20 rounded-xl px-5 py-4">
+                            <div className="flex space-x-1.5">
+                              <div className="w-2 h-2 bg-foreground/40 rounded-full animate-bounce" />
+                              <div
+                                className="w-2 h-2 bg-foreground/40 rounded-full animate-bounce"
+                                style={{ animationDelay: "0.15s" }}
+                              />
+                              <div
+                                className="w-2 h-2 bg-foreground/40 rounded-full animate-bounce"
+                                style={{ animationDelay: "0.3s" }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      <div ref={messagesEndRef} />
+                    </div>
+                  )}
+                </div>
+
+                <div className="shrink-0 bg-background pt-6 border-t border-border/10">
+                  <form onSubmit={sendMessage} className="flex gap-3">
+                    <Select value={questionNumber} onValueChange={setQuestionNumber}>
+                      <SelectTrigger className="w-32 shrink-0 bg-white border-border/20 font-medium">
+                        <SelectValue placeholder="Question" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">General</SelectItem>
+                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+                          <SelectItem key={n} value={n.toString()}>
+                            Q{n}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+
+                    <Input
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      placeholder="Type your question..."
+                      className="flex-1 bg-white border-border/20 h-11 text-[15px]"
+                      disabled={loading}
+                    />
+                    <Button type="submit" disabled={loading || !input.trim()} className="shrink-0 h-11 px-5">
+                      <Send className="w-4 h-4" />
+                    </Button>
+                  </form>
+                </div>
+              </div>
+            </ResizablePanel>
+          </ResizablePanelGroup>
+        )}
       </div>
     </div>
   );
