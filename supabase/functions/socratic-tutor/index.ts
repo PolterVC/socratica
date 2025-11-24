@@ -11,7 +11,11 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: cors });
   try {
     const { message, conversationId, questionNumber, allowDirectAnswers } = await req.json();
-    if (!message || !conversationId) return new Response(JSON.stringify({ error: "message and conversationId required" }), { status: 400, headers: { ...cors, "Content-Type": "application/json" } });
+    if (!message || !conversationId)
+      return new Response(JSON.stringify({ error: "message and conversationId required" }), {
+        status: 400,
+        headers: { ...cors, "Content-Type": "application/json" },
+      });
 
     const url = Deno.env.get("SUPABASE_URL")!;
     const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -26,15 +30,30 @@ serve(async (req) => {
     // Conversation, course, assignment
     const { data: convo, error: ce } = await admin
       .from("conversations")
-      .select("id, student_id, course_id, assignment_id, assignments(title, description, allow_direct_answers), courses(code, title)")
+      .select(
+        "id, student_id, course_id, assignment_id, assignments(title, description, allow_direct_answers), courses(code, title)",
+      )
       .eq("id", conversationId)
       .maybeSingle();
-    if (ce || !convo) return new Response(JSON.stringify({ error: "Conversation not found" }), { status: 404, headers: { ...cors, "Content-Type": "application/json" } });
+    if (ce || !convo)
+      return new Response(JSON.stringify({ error: "Conversation not found" }), {
+        status: 404,
+        headers: { ...cors, "Content-Type": "application/json" },
+      });
 
-    if (uid && convo.student_id && uid !== convo.student_id) return new Response(JSON.stringify({ error: "Forbidden" }), { status: 403, headers: { ...cors, "Content-Type": "application/json" } });
+    if (uid && convo.student_id && uid !== convo.student_id)
+      return new Response(JSON.stringify({ error: "Forbidden" }), {
+        status: 403,
+        headers: { ...cors, "Content-Type": "application/json" },
+      });
 
     // Recent history
-    const { data: hist } = await admin.from("messages").select("sender, text").eq("conversation_id", conversationId).order("created_at", { ascending: true }).limit(20);
+    const { data: hist } = await admin
+      .from("messages")
+      .select("sender, text")
+      .eq("conversation_id", conversationId)
+      .order("created_at", { ascending: true })
+      .limit(20);
 
     // Retrieval query - prefer assignment materials, then course materials
     const assignment = Array.isArray(convo.assignments) ? convo.assignments[0] : convo.assignments;
@@ -43,7 +62,7 @@ serve(async (req) => {
     const queryText = [message, assignmentTitle, assignmentDesc].filter(Boolean).join(" ");
 
     let rows: Array<{ content: string; title: string; kind: string }> = [];
-    
+
     // Get assignment materials first using full-text search
     const { data: assignmentMats } = await admin
       .from("material_text")
@@ -55,10 +74,10 @@ serve(async (req) => {
       .limit(5);
 
     if (assignmentMats && assignmentMats.length > 0) {
-      rows = assignmentMats.map((r: any) => ({ 
-        content: r.content, 
-        title: r.materials.title, 
-        kind: r.materials.kind 
+      rows = assignmentMats.map((r: any) => ({
+        content: r.content,
+        title: r.materials.title,
+        kind: r.materials.kind,
       }));
     } else {
       // Fallback to course materials using full-text search
@@ -70,12 +89,12 @@ serve(async (req) => {
         .eq("materials.text_extracted", true)
         .textSearch("tsv", message, { type: "websearch", config: "english" })
         .limit(5);
-      
+
       if (courseMats) {
-        rows = courseMats.map((r: any) => ({ 
-          content: r.content, 
-          title: r.materials.title, 
-          kind: r.materials.kind 
+        rows = courseMats.map((r: any) => ({
+          content: r.content,
+          title: r.materials.title,
+          kind: r.materials.kind,
         }));
       }
     }
@@ -122,8 +141,24 @@ Set confidence 0.0 to 1.0 based on how well the context matches. If you cannot i
 `;
 
     const apiKey = Deno.env.get("LOVABLE_API_KEY");
-    if (!apiKey) return new Response(JSON.stringify({ error: "LOVABLE_API_KEY missing" }), { status: 500, headers: { ...cors, "Content-Type": "application/json" } });
+    if (!apiKey)
+      return new Response(JSON.stringify({ error: "LOVABLE_API_KEY missing" }), {
+        status: 500,
+        headers: { ...cors, "Content-Type": "application/json" },
+      });
 
+    console.log(
+      "LLM PROMPT:",
+      JSON.stringify({
+        model: "google/gemini-2.5-flash",
+        temperature: 0.4,
+        messages: [
+          { role: "system", content: system },
+          ...(hist || []).map((m) => ({ role: m.sender === "student" ? "user" : "assistant", content: m.text })),
+          { role: "user", content: message },
+        ],
+      }),
+    );
     const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
@@ -133,36 +168,59 @@ Set confidence 0.0 to 1.0 based on how well the context matches. If you cannot i
         messages: [
           { role: "system", content: system },
           ...(hist || []).map((m) => ({ role: m.sender === "student" ? "user" : "assistant", content: m.text })),
-          { role: "user", content: message }
-        ]
-      })
+          { role: "user", content: message },
+        ],
+      }),
     });
 
     if (!resp.ok) {
       const text = await resp.text();
       console.error("LLM failure", resp.status, text);
-      return new Response(JSON.stringify({
-        tutor_reply: "I could not reach the tutor. Try again in a moment.",
-        metadata: { question_number: questionNumber ?? null, topic_tag: assignmentTitle || null, confusion_flag: false, citations: [], grounded: false, confidence: 0.0 }
-      }), { status: 200, headers: { ...cors, "Content-Type": "application/json" } });
+      return new Response(
+        JSON.stringify({
+          tutor_reply: "I could not reach the tutor. Try again in a moment.",
+          metadata: {
+            question_number: questionNumber ?? null,
+            topic_tag: assignmentTitle || null,
+            confusion_flag: false,
+            citations: [],
+            grounded: false,
+            confidence: 0.0,
+          },
+        }),
+        { status: 200, headers: { ...cors, "Content-Type": "application/json" } },
+      );
     }
 
     const json = await resp.json();
     const content = json?.choices?.[0]?.message?.content;
 
     let out;
-    try { out = JSON.parse(content); } catch {
+    try {
+      out = JSON.parse(content);
+    } catch {
       out = {
         tutor_reply: content || "Let us start from the assignment. What part do you want to focus on first?",
-        metadata: { question_number: questionNumber ?? null, topic_tag: assignmentTitle || null, confusion_flag: false, citations: [], grounded: false, confidence: 0.2 }
+        metadata: {
+          question_number: questionNumber ?? null,
+          topic_tag: assignmentTitle || null,
+          confusion_flag: false,
+          citations: [],
+          grounded: false,
+          confidence: 0.2,
+        },
       };
     }
 
     // Enforce policy
-    const allow = typeof allowDirectAnswers === "boolean" ? allowDirectAnswers : (assignment?.allow_direct_answers ?? false);
+    const allow =
+      typeof allowDirectAnswers === "boolean" ? allowDirectAnswers : (assignment?.allow_direct_answers ?? false);
     if (!allow) {
       // Simple guardrail text substitution
-      out.tutor_reply = String(out.tutor_reply || "").replace(/(?<=^|[\s])(?:(?:the )?final answer|complete solution|here is the answer)[\s:]/gi, "a guided next step: ");
+      out.tutor_reply = String(out.tutor_reply || "").replace(
+        /(?<=^|[\s])(?:(?:the )?final answer|complete solution|here is the answer)[\s:]/gi,
+        "a guided next step: ",
+      );
     }
 
     // Add citations if none but we had context
@@ -183,9 +241,19 @@ Set confidence 0.0 to 1.0 based on how well the context matches. If you cannot i
     return new Response(JSON.stringify(out), { status: 200, headers: { ...cors, "Content-Type": "application/json" } });
   } catch (e) {
     console.error("socratic-tutor error", e);
-    return new Response(JSON.stringify({
-      tutor_reply: "I hit an error. Ask again and I will try to help.",
-      metadata: { question_number: null, topic_tag: null, confusion_flag: false, citations: [], grounded: false, confidence: 0.0 }
-    }), { status: 200, headers: { ...cors, "Content-Type": "application/json" } });
+    return new Response(
+      JSON.stringify({
+        tutor_reply: "I hit an error. Ask again and I will try to help.",
+        metadata: {
+          question_number: null,
+          topic_tag: null,
+          confusion_flag: false,
+          citations: [],
+          grounded: false,
+          confidence: 0.0,
+        },
+      }),
+      { status: 200, headers: { ...cors, "Content-Type": "application/json" } },
+    );
   }
 });
