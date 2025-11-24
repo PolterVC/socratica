@@ -119,7 +119,7 @@ export default {
         'fade-out': 'fade-out 0.2s ease-out',
         'slide-in': 'slide-in 0.3s ease-out',
         'slide-out': 'slide-out 0.3s ease-out',
-        'scroll': 'scroll 30s linear infinite'
+        'scroll': 'scroll 15s linear infinite'
       }
     }
   },
