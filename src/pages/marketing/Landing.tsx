@@ -160,11 +160,12 @@ const Landing = () => {
                   See exactly where students struggle. Adjust instruction before the next class.
                 </CardDescription>
               </CardHeader>
-              <CardContent className="h-full grid grid-rows-[auto_1fr_auto]">
-                <div />
-                <div />
-                <div className="rounded-2xl bg-muted flex items-center justify-center h-44 md:h-48 lg:h-56">
-                  <AnalyticsDonut className="h-24 w-24 md:h-28 md:w-28" />
+              <CardContent className="h-full flex flex-col pt-0 pb-6">
+                <div className="text-sm text-muted-foreground space-y-2"></div>
+                <div className="mt-auto">
+                  <div className="rounded-2xl bg-muted h-48 md:h-56 flex items-center justify-center">
+                    <AnalyticsDonut className="h-24 w-24 md:h-28 md:w-28" />
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -177,13 +178,14 @@ const Landing = () => {
                   Every chart has a Why button that shows sources and examples.
                 </CardDescription>
               </CardHeader>
-              <CardContent className="h-full grid grid-rows-[auto_1fr_auto]">
+              <CardContent className="h-full flex flex-col pt-0 pb-6">
                 <p className="text-sm text-muted-foreground">
                   Trust what you are seeing with quick evidence previews.
                 </p>
-                <div />
-                <div className="rounded-2xl bg-muted flex items-center justify-center h-44 md:h-48 lg:h-56">
-                  <MiniBars className="h-24 w-40" />
+                <div className="mt-auto">
+                  <div className="rounded-2xl bg-muted h-48 md:h-56 flex items-center justify-center">
+                    <MiniBars className="h-24 w-40" />
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -196,13 +198,12 @@ const Landing = () => {
                   Guardrails block direct answers while allowing guided learning.
                 </CardDescription>
               </CardHeader>
-              <CardContent className="h-full grid grid-rows-[auto_1fr_auto]">
-                <p className="text-sm text-muted-foreground">
-                  No solution dumps. Citations required.
-                </p>
-                <div />
-                <div className="rounded-2xl bg-muted flex items-center justify-center h-44 md:h-48 lg:h-56">
-                  <GuardrailsMock className="h-24 w-56" />
+              <CardContent className="h-full flex flex-col pt-0 pb-6">
+                <p className="text-sm text-muted-foreground">No solution dumps. Citations required.</p>
+                <div className="mt-auto">
+                  <div className="rounded-2xl bg-muted h-48 md:h-56 flex items-center justify-center">
+                    <GuardrailsMock className="h-24 w-56" />
+                  </div>
                 </div>
               </CardContent>
             </Card>
