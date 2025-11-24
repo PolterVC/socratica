@@ -155,7 +155,17 @@ const CoursesTab = ({ userId }: { userId: string }) => {
               },
             });
 
-          if (uploadError) throw uploadError;
+          console.log("Upload response:", { uploadData, uploadError });
+
+          if (uploadError) {
+            console.error("Upload error details:", uploadError);
+            throw uploadError;
+          }
+
+          if (!uploadData?.uploadUrl || !uploadData?.materialId) {
+            console.error("Invalid upload response:", uploadData);
+            throw new Error("Invalid upload response from server");
+          }
 
           const uploadResponse = await fetch(uploadData.uploadUrl, {
             method: "PUT",
@@ -166,11 +176,14 @@ const CoursesTab = ({ userId }: { userId: string }) => {
             },
           });
 
+          console.log("Storage upload status:", uploadResponse.status);
+
           if (!uploadResponse.ok) {
             throw new Error("Assignment file upload failed");
           }
 
           const { chunks } = await extractTextFromPDF(assignmentFile);
+          console.log("Extracted chunks:", chunks.length);
 
           const { error: textError } = await supabase.functions.invoke(
             "materials-text",
@@ -182,7 +195,10 @@ const CoursesTab = ({ userId }: { userId: string }) => {
             }
           );
 
-          if (textError) throw textError;
+          if (textError) {
+            console.error("Text extraction error:", textError);
+            throw textError;
+          }
 
           toast.success("Assignment and file uploaded successfully");
         } catch (fileErr) {
