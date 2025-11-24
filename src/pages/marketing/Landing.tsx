@@ -4,7 +4,6 @@ import { Card } from "@/components/ui/card";
 import Navbar from "@/components/marketing/Navbar";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { MessageSquare, BookOpen, BarChart3, Shield } from "lucide-react";
 
 const Landing = () => {
   const [user, setUser] = useState<any>(null);
@@ -114,7 +113,7 @@ const Landing = () => {
               
               <div className="flex gap-3">
                 <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
-                  <MessageSquare className="w-5 h-5 text-muted-foreground" />
+                  <span className="text-xs font-medium text-muted-foreground">AI</span>
                 </div>
                 <div className="flex-1 bg-card rounded-lg px-4 py-3 border">
                   <p className="text-sm text-foreground leading-relaxed">
@@ -154,16 +153,11 @@ const Landing = () => {
             {/* Large Feature Card */}
             <Card className="md:col-span-2 p-8 bg-card border-border/50 hover:border-border transition-colors">
               <div className="space-y-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <MessageSquare className="w-6 h-6 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-bold text-foreground mb-2">Socratic tutoring</h3>
-                    <p className="text-muted-foreground leading-relaxed">
-                      AI guides students through problems with targeted questions, never giving direct answers. Builds genuine understanding.
-                    </p>
-                  </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-foreground mb-2">Socratic tutoring</h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    AI guides students through problems with targeted questions, never giving direct answers. Builds genuine understanding.
+                  </p>
                 </div>
                 <div className="bg-secondary/50 rounded-lg p-6 space-y-3 border border-border/30">
                   <div className="flex items-start gap-3">
@@ -185,9 +179,6 @@ const Landing = () => {
             {/* Material-Aware */}
             <Card className="p-8 bg-card border-border/50 hover:border-border transition-colors">
               <div className="space-y-6">
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <BookOpen className="w-6 h-6 text-primary" />
-                </div>
                 <div>
                   <h3 className="text-xl font-bold text-foreground mb-2">Material-aware AI</h3>
                   <p className="text-muted-foreground text-sm leading-relaxed">
@@ -197,7 +188,7 @@ const Landing = () => {
                 <div className="bg-secondary/50 rounded-lg p-4 border border-border/30">
                   <div className="flex items-center gap-2 mb-3">
                     <div className="w-8 h-8 rounded bg-muted flex items-center justify-center">
-                      <BookOpen className="w-4 h-4 text-muted-foreground" />
+                      <div className="w-4 h-5 border-2 border-muted-foreground/30 rounded-sm"></div>
                     </div>
                     <div className="text-xs font-medium text-foreground">Chapter_5.pdf</div>
                   </div>
@@ -213,9 +204,6 @@ const Landing = () => {
             {/* Teacher Analytics */}
             <Card className="p-8 bg-card border-border/50 hover:border-border transition-colors">
               <div className="space-y-6">
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <BarChart3 className="w-6 h-6 text-primary" />
-                </div>
                 <div>
                   <h3 className="text-xl font-bold text-foreground mb-2">Teacher analytics</h3>
                   <p className="text-muted-foreground text-sm leading-relaxed">
@@ -237,9 +225,6 @@ const Landing = () => {
             {/* Anti-Cheating */}
             <Card className="md:col-span-2 lg:col-span-1 p-8 bg-card border-border/50 hover:border-border transition-colors">
               <div className="space-y-6">
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <Shield className="w-6 h-6 text-primary" />
-                </div>
                 <div>
                   <h3 className="text-xl font-bold text-foreground mb-2">Academic integrity</h3>
                   <p className="text-muted-foreground text-sm leading-relaxed">
@@ -247,7 +232,9 @@ const Landing = () => {
                   </p>
                 </div>
                 <div className="bg-secondary/50 rounded-lg p-4 border border-border/30 flex items-center justify-center h-24">
-                  <Shield className="w-16 h-16 text-border" />
+                  <div className="w-12 h-16 border-4 border-border/50 rounded-sm flex items-center justify-center">
+                    <div className="w-4 h-4 bg-primary rounded-full"></div>
+                  </div>
                 </div>
               </div>
             </Card>
