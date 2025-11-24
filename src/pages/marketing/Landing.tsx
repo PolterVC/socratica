@@ -4,6 +4,10 @@ import { Card } from "@/components/ui/card";
 import Navbar from "@/components/marketing/Navbar";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import mcgillLogo from "@/assets/mcgill-logo.png";
+import udemLogo from "@/assets/udem-logo.png";
+import lavalLogo from "@/assets/laval-logo.png";
+import uoftLogo from "@/assets/uoft-logo.png";
 
 const Landing = () => {
   const [user, setUser] = useState<any>(null);
@@ -56,24 +60,17 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Social Proof */}
-      <section className="border-y bg-card">
-        <div className="container mx-auto px-6 py-8">
-          <div className="flex flex-col md:flex-row items-center justify-center gap-12 md:gap-16">
-            <div className="text-center">
-              <div className="text-4xl font-bold text-foreground">10,000+</div>
-              <div className="text-sm text-muted-foreground mt-1">Students helped</div>
-            </div>
-            <div className="hidden md:block w-px h-12 bg-border"></div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-foreground">500+</div>
-              <div className="text-sm text-muted-foreground mt-1">Teachers using</div>
-            </div>
-            <div className="hidden md:block w-px h-12 bg-border"></div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-foreground">95%</div>
-              <div className="text-sm text-muted-foreground mt-1">Satisfaction rate</div>
-            </div>
+      {/* University Logos */}
+      <section className="border-y bg-card overflow-hidden">
+        <div className="container mx-auto px-6 py-12">
+          <h3 className="text-center text-lg font-medium text-muted-foreground mb-8">
+            Tested by professors from these universities
+          </h3>
+          <div className="flex items-center justify-center gap-12 md:gap-16 flex-wrap">
+            <img src={mcgillLogo} alt="McGill University" className="h-12 object-contain opacity-70 hover:opacity-100 transition-opacity grayscale hover:grayscale-0" />
+            <img src={udemLogo} alt="Université de Montréal" className="h-12 object-contain opacity-70 hover:opacity-100 transition-opacity grayscale hover:grayscale-0" />
+            <img src={lavalLogo} alt="Université Laval" className="h-12 object-contain opacity-70 hover:opacity-100 transition-opacity grayscale hover:grayscale-0" />
+            <img src={uoftLogo} alt="University of Toronto" className="h-12 object-contain opacity-70 hover:opacity-100 transition-opacity grayscale hover:grayscale-0" />
           </div>
         </div>
       </section>
