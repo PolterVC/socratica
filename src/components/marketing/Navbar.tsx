@@ -51,8 +51,11 @@ const Navbar = () => {
         </Link>
         
         <div className="flex items-center gap-6">
-          <Link to="/pricing" className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">
+          <Link to="/mission" className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">
             Our Mission
+          </Link>
+          <Link to="/pricing" className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">
+            Pricing
           </Link>
           
           {user ? (
