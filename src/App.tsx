@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 // Marketing pages
 import Landing from "@/pages/marketing/Landing";
 import Pricing from "@/pages/marketing/Pricing";
+import Mission from "@/pages/marketing/Mission";
 import Privacy from "@/pages/marketing/Privacy";
 import Terms from "@/pages/marketing/Terms";
 
@@ -62,6 +63,7 @@ const App = () => (
           {/* Marketing routes */}
           <Route path="/" element={<Landing />} />
           <Route path="/pricing" element={<Pricing />} />
+          <Route path="/mission" element={<Mission />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
           
