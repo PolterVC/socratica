@@ -9,33 +9,28 @@ import { BarChart, Shield, X, Check } from "lucide-react";
 import mcgillLogo from "@/assets/mcgill-logo.png";
 import udemLogo from "@/assets/udem-logo.png";
 import concordiaLogo from "@/assets/concordia-logo.png";
-
 const Landing = () => {
   const [user, setUser] = useState<any>(null);
   const [role, setRole] = useState<string | null>(null);
-
   useEffect(() => {
     document.title = "Socratica - Guided AI for students, clear insights for teachers";
-    
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({
+      data: {
+        session
+      }
+    }) => {
       setUser(session?.user ?? null);
       if (session?.user) {
-        supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', session.user.id)
-          .single()
-          .then(({ data }) => {
-            setRole(data?.role ?? null);
-          });
+        supabase.from('user_roles').select('role').eq('user_id', session.user.id).single().then(({
+          data
+        }) => {
+          setRole(data?.role ?? null);
+        });
       }
     });
   }, []);
-
   const dashboardPath = role === "teacher" ? "/app/teacher" : "/app/student";
-
-  return (
-    <div className="min-h-screen bg-background">
+  return <div className="min-h-screen bg-background">
       <Navbar />
       
       {/* Hero Section */}
@@ -214,17 +209,14 @@ const Landing = () => {
                     See exactly where students struggle. Adjust instruction before the next class.
                   </p>
                 </div>
-                <div className="bg-secondary/50 rounded-lg p-6 border border-border/30 relative group mt-2">
+                <div className="bg-secondary/50 rounded-lg p-6 border border-border/30 relative group mt-2 py-[64px]">
                   <div className="flex items-center justify-center h-24 mb-4">
                     <div className="relative w-20 h-20">
                       <svg viewBox="0 0 100 100" className="transform -rotate-90">
                         <circle cx="50" cy="50" r="40" fill="none" stroke="hsl(var(--muted))" strokeWidth="20" />
-                        <circle cx="50" cy="50" r="40" fill="none" stroke="hsl(var(--primary))" strokeWidth="20" 
-                          strokeDasharray="125 251" strokeLinecap="round" />
-                        <circle cx="50" cy="50" r="40" fill="none" stroke="hsl(var(--primary) / 0.6)" strokeWidth="20" 
-                          strokeDasharray="75 251" strokeDashoffset="-125" strokeLinecap="round" />
-                        <circle cx="50" cy="50" r="40" fill="none" stroke="hsl(var(--muted))" strokeWidth="20" 
-                          strokeDasharray="51 251" strokeDashoffset="-200" strokeLinecap="round" />
+                        <circle cx="50" cy="50" r="40" fill="none" stroke="hsl(var(--primary))" strokeWidth="20" strokeDasharray="125 251" strokeLinecap="round" />
+                        <circle cx="50" cy="50" r="40" fill="none" stroke="hsl(var(--primary) / 0.6)" strokeWidth="20" strokeDasharray="75 251" strokeDashoffset="-125" strokeLinecap="round" />
+                        <circle cx="50" cy="50" r="40" fill="none" stroke="hsl(var(--muted))" strokeWidth="20" strokeDasharray="51 251" strokeDashoffset="-200" strokeLinecap="round" />
                       </svg>
                     </div>
                   </div>
@@ -258,9 +250,15 @@ const Landing = () => {
                 </div>
                 <div className="bg-secondary/50 rounded-lg p-6 border border-border/30 relative group">
                   <div className="flex items-end gap-2 h-24 mb-4">
-                    <div className="flex-1 bg-muted rounded-t" style={{ height: '50%' }}></div>
-                    <div className="flex-1 bg-primary/70 rounded-t" style={{ height: '75%' }}></div>
-                    <div className="flex-1 bg-primary rounded-t" style={{ height: '90%' }}></div>
+                    <div className="flex-1 bg-muted rounded-t" style={{
+                    height: '50%'
+                  }}></div>
+                    <div className="flex-1 bg-primary/70 rounded-t" style={{
+                    height: '75%'
+                  }}></div>
+                    <div className="flex-1 bg-primary rounded-t" style={{
+                    height: '90%'
+                  }}></div>
                   </div>
                   <Badge className="absolute top-4 right-4 text-xs">Why</Badge>
                   <p className="text-xs text-muted-foreground text-center">Question confusion trends</p>
@@ -436,8 +434,6 @@ const Landing = () => {
           </div>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 };
-
 export default Landing;
