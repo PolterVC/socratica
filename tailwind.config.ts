@@ -108,11 +108,10 @@ export default {
           to: { transform: 'translateX(-100%)' }
         },
         'scroll': {
-          '0%': { transform: 'translateX(0)' },
-          '45%': { transform: 'translateX(-33.33%)' },
-          '55%': { transform: 'translateX(-33.33%)' },
-          '95%': { transform: 'translateX(-66.66%)' },
-          '100%': { transform: 'translateX(-66.66%)' }
+          '0%, 30%': { transform: 'translateX(0)' },
+          '33%, 63%': { transform: 'translateX(-33.33%)' },
+          '66%, 96%': { transform: 'translateX(-66.66%)' },
+          '100%': { transform: 'translateX(-100%)' }
         }
       },
       animation: {
@@ -122,7 +121,7 @@ export default {
         'fade-out': 'fade-out 0.2s ease-out',
         'slide-in': 'slide-in 0.3s ease-out',
         'slide-out': 'slide-out 0.3s ease-out',
-        'scroll': 'scroll 20s ease-in-out infinite'
+        'scroll': 'scroll 12s ease-in-out infinite'
       }
     }
   },
