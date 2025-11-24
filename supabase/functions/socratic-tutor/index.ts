@@ -44,14 +44,14 @@ serve(async (req) => {
 
     let rows: Array<{ content: string; title: string; kind: string }> = [];
     
-    // Get assignment materials first
+    // Get assignment materials first using full-text search
     const { data: assignmentMats } = await admin
       .from("material_text")
       .select("content, materials!inner(title, kind, course_id, assignment_id)")
       .eq("materials.course_id", convo.course_id)
       .eq("materials.assignment_id", convo.assignment_id)
       .eq("materials.text_extracted", true)
-      .order("chunk_index", { ascending: true })
+      .textSearch("tsv", message, { type: "websearch", config: "english" })
       .limit(5);
 
     if (assignmentMats && assignmentMats.length > 0) {
@@ -61,14 +61,14 @@ serve(async (req) => {
         kind: r.materials.kind 
       }));
     } else {
-      // Fallback to course materials
+      // Fallback to course materials using full-text search
       const { data: courseMats } = await admin
         .from("material_text")
         .select("content, materials!inner(title, kind, course_id, assignment_id)")
         .eq("materials.course_id", convo.course_id)
         .is("materials.assignment_id", null)
         .eq("materials.text_extracted", true)
-        .order("chunk_index", { ascending: true })
+        .textSearch("tsv", message, { type: "websearch", config: "english" })
         .limit(5);
       
       if (courseMats) {

@@ -10,9 +10,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Send, ArrowLeft } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
+import { Send, ArrowLeft, FileText } from "lucide-react";
 import { toast } from "sonner";
-import MaterialsList from "@/components/student/MaterialsList";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface Message {
   id: string;
@@ -40,8 +42,11 @@ const Chat = () => {
   const [loading, setLoading] = useState(false);
   const [conversationInfo, setConversationInfo] = useState<ConversationInfo | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const [loadingPdf, setLoadingPdf] = useState(true);
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const isMobile = useIsMobile();
 
   // scroll
   const scrollToBottom = () => {
@@ -71,6 +76,7 @@ const Chat = () => {
     const init = async () => {
       await loadConversation(conversationId);
       await loadMessages(conversationId);
+      await loadAssignmentPdf(conversationId);
     };
 
     init();
@@ -128,6 +134,44 @@ const Chat = () => {
     }
 
     setMessages((data as Message[]) || []);
+  };
+
+  const loadAssignmentPdf = async (id: string) => {
+    setLoadingPdf(true);
+    try {
+      const { data: convo } = await supabase
+        .from("conversations")
+        .select("assignment_id, course_id")
+        .eq("id", id)
+        .single();
+
+      if (!convo) return;
+
+      // Fetch materials for this assignment, prioritize "questions" type
+      const { data: materials } = await supabase
+        .from("materials")
+        .select("id, storage_path, kind, title")
+        .eq("assignment_id", convo.assignment_id)
+        .eq("text_extracted", true)
+        .order("kind", { ascending: true }); // questions comes before answers alphabetically
+
+      if (materials && materials.length > 0) {
+        // Prioritize questions type
+        const questionMaterial = materials.find(m => m.kind === "questions" || m.kind === "questions_with_answers") || materials[0];
+        
+        const { data: signedUrl } = await supabase.storage
+          .from("materials")
+          .createSignedUrl(questionMaterial.storage_path, 3600);
+
+        if (signedUrl) {
+          setPdfUrl(signedUrl.signedUrl);
+        }
+      }
+    } catch (error) {
+      console.error("Error loading PDF:", error);
+    } finally {
+      setLoadingPdf(false);
+    }
   };
 
   const subscribeToMessages = (id: string) => {
@@ -250,9 +294,16 @@ const Chat = () => {
         </div>
       </header>
 
-      <div className="flex-1 flex flex-col max-w-5xl mx-auto w-full px-6 py-10">
-        <div className="flex-1 flex flex-col gap-8 min-h-0">
-          <div className="flex-1 overflow-y-auto pr-2 space-y-1">
+      <div className="flex-1 overflow-hidden">
+        {isMobile ? (
+          <Tabs defaultValue="chat" className="h-full flex flex-col">
+            <TabsList className="w-full justify-start px-6 pt-4">
+              <TabsTrigger value="chat">Chat</TabsTrigger>
+              <TabsTrigger value="assignment">Assignment</TabsTrigger>
+            </TabsList>
+            <TabsContent value="chat" className="flex-1 overflow-hidden mt-0">
+              <div className="h-full flex flex-col px-6 py-6">
+                <div className="flex-1 overflow-y-auto pr-2 space-y-1">
             {messages.length === 0 && !loading ? (
               <div className="h-full flex items-center justify-center">
                 <div className="text-center max-w-lg space-y-2">
@@ -328,8 +379,8 @@ const Chat = () => {
             )}
           </div>
 
-          <div className="shrink-0 bg-background pt-6 border-t border-border/10">
-            <form onSubmit={sendMessage} className="flex gap-3">
+                <div className="shrink-0 bg-background pt-6 border-t border-border/10">
+                  <form onSubmit={sendMessage} className="flex gap-3">
               <Select value={questionNumber} onValueChange={setQuestionNumber}>
                 <SelectTrigger className="w-32 shrink-0 bg-white border-border/20 font-medium">
                   <SelectValue placeholder="Question" />
@@ -354,17 +405,163 @@ const Chat = () => {
               <Button type="submit" disabled={loading || !input.trim()} className="shrink-0 h-11 px-5">
                 <Send className="w-4 h-4" />
               </Button>
-            </form>
-            {conversationInfo && (
-              <div className="mt-6 pt-6 border-t border-border/10">
-                <MaterialsList
-                  courseId={conversationInfo.course.id}
-                  assignmentId={conversationInfo.assignment.id}
-                />
+                  </form>
+                </div>
               </div>
-            )}
-          </div>
-        </div>
+            </TabsContent>
+            <TabsContent value="assignment" className="flex-1 overflow-hidden mt-0">
+              <div className="h-full p-6">
+                {loadingPdf ? (
+                  <div className="h-full flex items-center justify-center">
+                    <p className="text-muted-foreground">Loading assignment PDF...</p>
+                  </div>
+                ) : pdfUrl ? (
+                  <iframe src={pdfUrl} className="w-full h-full border rounded-lg" title="Assignment PDF" />
+                ) : (
+                  <div className="h-full flex items-center justify-center">
+                    <div className="text-center space-y-2">
+                      <FileText className="w-12 h-12 mx-auto text-muted-foreground/40" />
+                      <p className="text-muted-foreground">No assignment PDF available</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </TabsContent>
+          </Tabs>
+        ) : (
+          <ResizablePanelGroup direction="horizontal" className="h-full">
+            <ResizablePanel defaultSize={50} minSize={30}>
+              <div className="h-full flex flex-col p-6">
+                <h2 className="text-lg font-semibold mb-4">Assignment</h2>
+                {loadingPdf ? (
+                  <div className="flex-1 flex items-center justify-center">
+                    <p className="text-muted-foreground">Loading PDF...</p>
+                  </div>
+                ) : pdfUrl ? (
+                  <iframe src={pdfUrl} className="flex-1 w-full border rounded-lg" title="Assignment PDF" />
+                ) : (
+                  <div className="flex-1 flex items-center justify-center">
+                    <div className="text-center space-y-2">
+                      <FileText className="w-12 h-12 mx-auto text-muted-foreground/40" />
+                      <p className="text-muted-foreground">No assignment PDF available</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </ResizablePanel>
+            
+            <ResizableHandle withHandle />
+            
+            <ResizablePanel defaultSize={50} minSize={30}>
+              <div className="h-full flex flex-col px-6 py-6">
+                <div className="flex-1 overflow-y-auto pr-2 space-y-1">
+                  {messages.length === 0 && !loading ? (
+                    <div className="h-full flex items-center justify-center">
+                      <div className="text-center max-w-lg space-y-2">
+                        <p className="text-foreground/60 text-base leading-relaxed">
+                          Ask a question about the assignment.
+                        </p>
+                        <p className="text-foreground/40 text-sm">
+                          The tutor will guide you through thinking, not give you the answer.
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-6">
+                      {messages.map((message) => (
+                        <div key={message.id}>
+                          <div
+                            className={`flex ${
+                              message.sender === "student" ? "justify-end" : "justify-start"
+                            }`}
+                          >
+                            <div
+                              className={`max-w-[75%] rounded-xl px-5 py-4 ${
+                                message.sender === "student"
+                                  ? "bg-primary text-primary-foreground shadow-sm"
+                                  : "bg-muted/50 border border-border/20"
+                              }`}
+                            >
+                              <p className="whitespace-pre-wrap leading-relaxed text-[15px]">{message.text}</p>
+                              {message.sender === "tutor" && message.materials_referenced && message.materials_referenced.length > 0 && (
+                                <div className="mt-4 pt-4 border-t border-border/20">
+                                  <p className="text-xs font-medium mb-2.5 text-foreground/50 uppercase tracking-wide">Referenced materials</p>
+                                  <div className="flex flex-wrap gap-2">
+                                    {message.materials_referenced.map((mat, idx) => (
+                                      <span
+                                        key={idx}
+                                        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs bg-background border border-border/30"
+                                      >
+                                        <span className="text-foreground/40 font-medium">{mat.kind}</span>
+                                        <span className="text-foreground/70">{mat.title}</span>
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          {message.sender === "student" && (
+                            <p className="text-[11px] text-foreground/30 mt-2 text-right mr-1 uppercase tracking-wider">
+                              Logged for instructor insight
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                      {loading && (
+                        <div className="flex justify-start">
+                          <div className="bg-muted/50 border border-border/20 rounded-xl px-5 py-4">
+                            <div className="flex space-x-1.5">
+                              <div className="w-2 h-2 bg-foreground/40 rounded-full animate-bounce" />
+                              <div
+                                className="w-2 h-2 bg-foreground/40 rounded-full animate-bounce"
+                                style={{ animationDelay: "0.15s" }}
+                              />
+                              <div
+                                className="w-2 h-2 bg-foreground/40 rounded-full animate-bounce"
+                                style={{ animationDelay: "0.3s" }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      <div ref={messagesEndRef} />
+                    </div>
+                  )}
+                </div>
+
+                <div className="shrink-0 bg-background pt-6 border-t border-border/10">
+                  <form onSubmit={sendMessage} className="flex gap-3">
+                    <Select value={questionNumber} onValueChange={setQuestionNumber}>
+                      <SelectTrigger className="w-32 shrink-0 bg-white border-border/20 font-medium">
+                        <SelectValue placeholder="Question" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">General</SelectItem>
+                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+                          <SelectItem key={n} value={n.toString()}>
+                            Q{n}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+
+                    <Input
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      placeholder="Type your question..."
+                      className="flex-1 bg-white border-border/20 h-11 text-[15px]"
+                      disabled={loading}
+                    />
+                    <Button type="submit" disabled={loading || !input.trim()} className="shrink-0 h-11 px-5">
+                      <Send className="w-4 h-4" />
+                    </Button>
+                  </form>
+                </div>
+              </div>
+            </ResizablePanel>
+          </ResizablePanelGroup>
+        )}
       </div>
     </div>
   );

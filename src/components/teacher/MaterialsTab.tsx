@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import { extractTextFromPDF } from "@/utils/pdfExtractor";
-import { FileText, Upload, CheckCircle, Clock, Download, Trash2 } from "lucide-react";
+import { FileText, Upload, CheckCircle, Clock, Download, Trash2, FileQuestion, FileCheck } from "lucide-react";
 
 type MaterialItem = {
   id: string;
@@ -133,15 +133,12 @@ export default function MaterialsTab({ courseId, assignmentId, isTeacher }: { co
               <div className="space-y-2">
                 <Label>Type</Label>
                 <Select value={kind} onValueChange={setKind} disabled={busy}>
-                  <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder="Select type" /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="assignment">Assignment</SelectItem>
-                    <SelectItem value="questions">Questions Only</SelectItem>
-                    <SelectItem value="answers">Answers Only</SelectItem>
-                    <SelectItem value="questions_with_answers">Questions + Answers</SelectItem>
-                    <SelectItem value="slides">Slides</SelectItem>
-                    <SelectItem value="reading">Reading</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
+                    <SelectItem value="questions">Assignment Questions</SelectItem>
+                    <SelectItem value="answers">Answer Key / Solutions</SelectItem>
+                    <SelectItem value="questions_with_answers">Combined Questions &amp; Answers</SelectItem>
+                    <SelectItem value="slides">Reference / Slides</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -170,14 +167,23 @@ export default function MaterialsTab({ courseId, assignmentId, isTeacher }: { co
             <div className="text-sm text-muted-foreground">No materials yet.</div>
           ) : (
             <div className="space-y-3">
-              {items.map((m) => (
+              {items.map((m) => {
+                const isQuestions = m.kind === "questions" || m.kind === "questions_with_answers";
+                const isAnswers = m.kind === "answers" || m.kind === "questions_with_answers";
+                const Icon = isQuestions ? FileQuestion : isAnswers ? FileCheck : FileText;
+                
+                return (
                 <div key={m.id} className="flex items-center justify-between border rounded-lg px-3 py-2">
                   <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <FileText className="w-4 h-4 shrink-0" />
+                    <Icon className={`w-4 h-4 shrink-0 ${isQuestions ? "text-blue-600" : isAnswers ? "text-green-600" : ""}`} />
                     <div className="min-w-0 flex-1">
-                      <div className="font-medium truncate">{m.title}</div>
+                      <div className="font-medium truncate flex items-center gap-2">
+                        {m.title}
+                        {isQuestions && <span className="text-xs px-2 py-0.5 rounded bg-blue-100 text-blue-700 font-normal">Questions</span>}
+                        {isAnswers && m.kind === "answers" && <span className="text-xs px-2 py-0.5 rounded bg-green-100 text-green-700 font-normal">Answers</span>}
+                      </div>
                       <div className="text-xs text-muted-foreground">
-                        {m.kind.replace(/_/g, " ")} • {m.file_size ? `${(m.file_size / (1024 * 1024)).toFixed(1)} MB` : "Size unknown"} • {new Date(m.created_at).toLocaleDateString()}
+                        {m.kind === "questions" ? "Assignment Questions" : m.kind === "answers" ? "Answer Key / Solutions" : m.kind === "questions_with_answers" ? "Combined Questions & Answers" : m.kind === "slides" ? "Reference / Slides" : m.kind.replace(/_/g, " ")} • {m.file_size ? `${(m.file_size / (1024 * 1024)).toFixed(1)} MB` : "Size unknown"} • {new Date(m.created_at).toLocaleDateString()}
                       </div>
                     </div>
                     {m.text_extracted ? (
@@ -205,7 +211,7 @@ export default function MaterialsTab({ courseId, assignmentId, isTeacher }: { co
                     )}
                   </div>
                 </div>
-              ))}
+              )})}
             </div>
           )}
         </CardContent>
