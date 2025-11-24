@@ -214,14 +214,35 @@ const Landing = () => {
                     See exactly where students struggle. Adjust instruction before the next class.
                   </p>
                 </div>
-                <div className="bg-secondary/50 rounded-lg p-4 border border-border/30">
-                  <div className="flex items-end gap-2 h-24">
-                    <div className="flex-1 bg-muted rounded-t" style={{ height: '60%' }}></div>
-                    <div className="flex-1 bg-primary/70 rounded-t" style={{ height: '85%' }}></div>
-                    <div className="flex-1 bg-muted rounded-t" style={{ height: '45%' }}></div>
-                    <div className="flex-1 bg-primary rounded-t" style={{ height: '95%' }}></div>
+                <div className="bg-secondary/50 rounded-lg p-6 border border-border/30 relative group">
+                  <div className="flex items-center justify-center h-32">
+                    <div className="relative w-28 h-28">
+                      <svg viewBox="0 0 100 100" className="transform -rotate-90">
+                        <circle cx="50" cy="50" r="40" fill="none" stroke="hsl(var(--muted))" strokeWidth="20" />
+                        <circle cx="50" cy="50" r="40" fill="none" stroke="hsl(var(--primary))" strokeWidth="20" 
+                          strokeDasharray="125 251" strokeLinecap="round" />
+                        <circle cx="50" cy="50" r="40" fill="none" stroke="hsl(var(--primary) / 0.6)" strokeWidth="20" 
+                          strokeDasharray="75 251" strokeDashoffset="-125" strokeLinecap="round" />
+                        <circle cx="50" cy="50" r="40" fill="none" stroke="hsl(var(--muted))" strokeWidth="20" 
+                          strokeDasharray="51 251" strokeDashoffset="-200" strokeLinecap="round" />
+                      </svg>
+                    </div>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-3">Question difficulty distribution</p>
+                  <p className="text-xs text-muted-foreground text-center mt-4">Topic confusion breakdown</p>
+                  <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute inset-0 bg-background/95 rounded-lg p-4 flex flex-col justify-center gap-3">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-primary"></div>
+                      <p className="text-xs text-foreground">Equilibrium - 45%</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-primary/60"></div>
+                      <p className="text-xs text-foreground">Supply curves - 30%</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-muted"></div>
+                      <p className="text-xs text-foreground">Other topics - 25%</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </Card>
