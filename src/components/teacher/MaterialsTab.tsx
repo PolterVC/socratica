@@ -73,32 +73,54 @@ export default function MaterialsTab({ courseId, assignmentId, isTeacher }: { co
       const { data: start, error } = await supabase.functions.invoke("materials-upload", {
         body: { courseId, assignmentId: assignmentId ?? null, filename: file.name, title, kind, fileSize: file.size }
       });
-      if (error || !start?.uploadUrl || !start?.materialId) {
-        console.error(error, start);
-        toast.error(start?.error || "Could not start upload");
+      if (error) {
+        console.error("Edge function error:", error);
+        toast.error(error.message || "Could not start upload");
+        setBusy(false);
+        return;
+      }
+      if (!start?.uploadUrl || !start?.materialId) {
+        console.error("Invalid response from materials-upload:", start);
+        toast.error(start?.error || "Could not create upload URL");
         setBusy(false);
         return;
       }
 
       setPct(40);
-      await putWithProgress(start.uploadUrl, file, setPct);
+      try {
+        await putWithProgress(start.uploadUrl, file, setPct);
+      } catch (uploadErr) {
+        console.error("File upload error:", uploadErr);
+        toast.error("Failed to upload file to storage");
+        setBusy(false);
+        return;
+      }
 
       setPct(60);
       toast.info("Extracting text");
-      const { chunks } = await extractTextFromPDF(file);
-      
-      setPct(80);
-      const { error: textErr } = await supabase.functions.invoke("materials-text", { body: { materialId: start.materialId, chunks } });
-      
-      setPct(100);
-      if (textErr) toast.error("Upload done, but text extraction failed"); 
-      else toast.success("Upload complete");
+      try {
+        const { chunks } = await extractTextFromPDF(file);
+        
+        setPct(80);
+        const { error: textErr } = await supabase.functions.invoke("materials-text", { body: { materialId: start.materialId, chunks } });
+        
+        if (textErr) {
+          console.error("Text extraction error:", textErr);
+          toast.error("Upload done, but text extraction failed");
+        } else {
+          toast.success("Upload complete");
+        }
+      } catch (extractErr) {
+        console.error("PDF extraction error:", extractErr);
+        toast.error("Upload done, but couldn't extract text from PDF");
+      }
 
+      setPct(100);
       setFile(null); setTitle(""); setPct(0);
       await list();
     } catch (e) {
-      console.error(e);
-      toast.error("Upload failed");
+      console.error("Upload error:", e);
+      toast.error(e instanceof Error ? e.message : "Upload failed");
     } finally {
       setBusy(false);
     }
