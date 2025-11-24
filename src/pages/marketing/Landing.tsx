@@ -2,11 +2,10 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Navbar from "@/components/marketing/Navbar";
+import LogoCarousel from "@/components/marketing/LogoCarousel";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import mcgillLogo from "@/assets/mcgill-logo.png";
-import udemLogo from "@/assets/udem-logo.png";
-import concordiaLogo from "@/assets/concordia-logo.png";
+import { universityLogos } from "@/data/logos";
 
 const Landing = () => {
   const [user, setUser] = useState<any>(null);
@@ -63,16 +62,11 @@ const Landing = () => {
         Profs from these schools can&apos;t wait to test Socratica
       </h3>
 
-      {/* University Logos */}
-      <section className="border-y bg-card">
-        <div className="container mx-auto px-6 py-12">
-          <div className="flex items-center justify-center gap-12 md:gap-20 flex-wrap">
-            <img src={mcgillLogo} alt="McGill University" className="h-16 md:h-20 object-contain opacity-70 hover:opacity-100 transition-opacity" />
-            <img src={udemLogo} alt="Université de Montréal" className="h-16 md:h-20 object-contain opacity-70 hover:opacity-100 transition-opacity" />
-            <img src={concordiaLogo} alt="Concordia University" className="h-16 md:h-20 object-contain opacity-70 hover:opacity-100 transition-opacity" />
-          </div>
-        </div>
-      </section>
+      <h2 className="text-center text-lg md:text-xl text-muted-foreground mb-8 px-6">
+        Profs from these schools can&apos;t wait to test Socratica
+      </h2>
+
+      <LogoCarousel logos={universityLogos} />
 
       {/* Problem/Solution Split */}
       <section className="container mx-auto px-6 py-32">
