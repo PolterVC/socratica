@@ -1,9 +1,11 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/marketing/Navbar";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { BarChart, Shield, X, Check } from "lucide-react";
 import mcgillLogo from "@/assets/mcgill-logo.png";
 import udemLogo from "@/assets/udem-logo.png";
 import concordiaLogo from "@/assets/concordia-logo.png";
@@ -224,18 +226,83 @@ const Landing = () => {
               </div>
             </Card>
 
-            {/* Anti-Cheating */}
-            <Card className="md:col-span-2 lg:col-span-1 p-8 bg-card border-border/50 hover:border-border transition-colors">
+            {/* Explainable Insights */}
+            <Card className="md:col-span-2 p-8 bg-card border-border/50 hover:border-border transition-colors">
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-2xl font-bold text-foreground mb-2">Explainable insights</h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    Every chart has a Why button that shows the examples and sources behind an alert, so instructors can trust what they are seeing.
+                  </p>
+                </div>
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="bg-secondary/50 rounded-lg p-6 border border-border/30">
+                    <div className="space-y-3">
+                      <div className="flex items-start gap-3">
+                        <div className="w-2 h-2 rounded-full bg-primary mt-2"></div>
+                        <p className="text-sm text-foreground">"Top 3 questions driving confusion"</p>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <div className="w-2 h-2 rounded-full bg-primary mt-2"></div>
+                        <p className="text-sm text-foreground">"PDF snippets used in answers"</p>
+                      </div>
+                      <div className="flex items-start gap-3">
+                        <div className="w-2 h-2 rounded-full bg-primary mt-2"></div>
+                        <p className="text-sm text-foreground">"3 anonymized chat examples"</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-secondary/50 rounded-lg p-6 border border-border/30 relative group">
+                    <div className="flex items-end gap-2 h-24 mb-4">
+                      <div className="flex-1 bg-muted rounded-t" style={{ height: '50%' }}></div>
+                      <div className="flex-1 bg-primary/70 rounded-t" style={{ height: '75%' }}></div>
+                      <div className="flex-1 bg-primary rounded-t" style={{ height: '90%' }}></div>
+                    </div>
+                    <Badge className="absolute top-4 right-4 text-xs">Why</Badge>
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute inset-0 bg-background/95 rounded-lg p-4 flex flex-col gap-2">
+                      <p className="text-xs text-muted-foreground italic">"I'm confused about the equilibrium..."</p>
+                      <p className="text-xs text-muted-foreground italic">"Why does the curve shift left?"</p>
+                      <div className="mt-2">
+                        <Badge variant="outline" className="text-xs">Slides Week 3</Badge>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Card>
+
+            {/* Academic Integrity - Guardrails */}
+            <Card className="p-8 bg-card border-border/50 hover:border-border transition-colors">
               <div className="space-y-6">
                 <div>
                   <h3 className="text-xl font-bold text-foreground mb-2">Academic integrity</h3>
                   <p className="text-muted-foreground text-sm leading-relaxed">
-                    Designed to prevent cheating while providing genuine learning support.
+                    Built-in guardrails that block direct answers while allowing guided learning.
                   </p>
                 </div>
-                <div className="bg-secondary/50 rounded-lg p-4 border border-border/30 flex items-center justify-center h-24">
-                  <div className="w-12 h-16 border-4 border-border/50 rounded-sm flex items-center justify-center">
-                    <div className="w-4 h-4 bg-primary rounded-full"></div>
+                <div className="bg-secondary/50 rounded-lg p-6 border border-border/30 space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-destructive/10 flex items-center justify-center flex-shrink-0">
+                      <X className="w-4 h-4 text-destructive" />
+                    </div>
+                    <div className="flex-1 bg-destructive/5 rounded px-3 py-2 border border-destructive/20">
+                      <p className="text-xs text-muted-foreground">"Can you just give me the answer"</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-center gap-2 py-2">
+                    <Shield className="w-4 h-4 text-primary" />
+                    <div className="flex gap-2">
+                      <Badge variant="secondary" className="text-xs">No direct answers</Badge>
+                      <Badge variant="secondary" className="text-xs">Citations required</Badge>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-green-500/10 flex items-center justify-center flex-shrink-0">
+                      <Check className="w-4 h-4 text-green-600" />
+                    </div>
+                    <div className="flex-1 bg-green-500/5 rounded px-3 py-2 border border-green-500/20">
+                      <p className="text-xs text-muted-foreground">"Let's outline steps, then you try step 1"</p>
+                    </div>
                   </div>
                 </div>
               </div>
