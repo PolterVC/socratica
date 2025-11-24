@@ -63,7 +63,7 @@ serve(async (req) => {
 
     let rows: Array<{ content: string; title: string; kind: string }> = [];
 
-    // Get assignment materials first using full-text search
+    // Get assignment materials first using semantic search (top 7 most relevant chunks)
     const { data: assignmentMats } = await admin
       .from("material_text")
       .select("content, materials!inner(title, kind, course_id, assignment_id)")
@@ -71,7 +71,7 @@ serve(async (req) => {
       .eq("materials.assignment_id", convo.assignment_id)
       .eq("materials.text_extracted", true)
       .textSearch("tsv", message, { type: "websearch", config: "english" })
-      .limit(5);
+      .limit(7);
 
     if (assignmentMats && assignmentMats.length > 0) {
       rows = assignmentMats.map((r: any) => ({
@@ -80,7 +80,7 @@ serve(async (req) => {
         kind: r.materials.kind,
       }));
     } else {
-      // Fallback to course materials using full-text search
+      // Fallback to course materials using semantic search
       const { data: courseMats } = await admin
         .from("material_text")
         .select("content, materials!inner(title, kind, course_id, assignment_id)")
@@ -88,7 +88,7 @@ serve(async (req) => {
         .is("materials.assignment_id", null)
         .eq("materials.text_extracted", true)
         .textSearch("tsv", message, { type: "websearch", config: "english" })
-        .limit(5);
+        .limit(7);
 
       if (courseMats) {
         rows = courseMats.map((r: any) => ({
@@ -99,12 +99,23 @@ serve(async (req) => {
       }
     }
 
-    // Build context and citations
+    // Build context with explicit source labels and citations
     let context = "";
     const citations: Array<{ material_title: string; kind: string; snippet: string }> = [];
-    for (const r of rows.slice(0, 5)) {
+    for (const r of rows.slice(0, 7)) {
       const snippet = r.content.slice(0, 320);
-      context += `[Material: ${r.title} (${r.kind})]\n${snippet}\n\n`;
+      // Label sources clearly for AI to understand content type
+      let sourceLabel = "";
+      if (r.kind === "answers") {
+        sourceLabel = "[SOURCE: Answer Key - DO NOT REVEAL DIRECTLY]";
+      } else if (r.kind === "questions_with_answers") {
+        sourceLabel = "[SOURCE: Combined Questions & Answers - USE CAREFULLY]";
+      } else if (r.kind === "questions") {
+        sourceLabel = "[SOURCE: Assignment Questions]";
+      } else {
+        sourceLabel = `[SOURCE: ${r.kind}]`;
+      }
+      context += `${sourceLabel}\n[Material: ${r.title}]\n${snippet}\n\n`;
       citations.push({ material_title: r.title, kind: r.kind, snippet });
     }
     const grounded = citations.length > 0;
@@ -116,16 +127,26 @@ Assignment:
 Title: ${assignmentTitle}
 Description: ${assignmentDesc}
 
-Context from teacher PDFs follows. Prefer this when helping the student. If something is not covered, say so and reason carefully.
+Context from teacher PDFs follows. Use this context to guide the student effectively.
 
 <<CONTEXT>>
 ${context}
 <<END CONTEXT>>
 
+CRITICAL INSTRUCTIONS FOR ANSWER KEY CONTENT:
+- Content marked [SOURCE: Answer Key - DO NOT REVEAL DIRECTLY] contains solutions that must NEVER be revealed directly to students.
+- Use Answer Key content ONLY to:
+  1. Verify if the student's reasoning is on the right track
+  2. Check if their answer is correct (without revealing why)
+  3. Guide them toward the correct approach without giving away the solution
+- When you see answer key content, respond with guiding questions like "Are you sure about that step?" or "What if you considered...?" instead of revealing the answer.
+- For [SOURCE: Combined Questions & Answers], be very careful to only reference the question parts when helping students.
+
 Rules:
-- Guide the student. Do not write full graded answers when direct answers are not allowed.
-- Always end with a follow up question.
-- Output JSON only in this shape:
+- Guide the student through Socratic questioning. Do not write full graded answers unless allowDirectAnswers is explicitly true.
+- Ground your responses in the provided context materials when available.
+- Always end with a follow-up question that moves the student's thinking forward.
+- Output JSON only in this exact shape:
 {
   "tutor_reply": "string",
   "metadata": {
@@ -137,7 +158,7 @@ Rules:
     "confidence": number
   }
 }
-Set confidence 0.0 to 1.0 based on how well the context matches. If you cannot infer a field, set a safe default.
+Set confidence 0.0 to 1.0 based on how well the context matches the student's question. If you cannot infer a field, set a safe default.
 `;
 
     const apiKey = Deno.env.get("LOVABLE_API_KEY");

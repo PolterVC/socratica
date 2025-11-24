@@ -44,6 +44,8 @@ const Chat = () => {
   const [userRole, setUserRole] = useState<string | null>(null);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [loadingPdf, setLoadingPdf] = useState(true);
+  const [availablePdfs, setAvailablePdfs] = useState<Array<{ id: string; title: string; url: string; kind: string }>>([]);
+  const [selectedPdfIndex, setSelectedPdfIndex] = useState(0);
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const isMobile = useIsMobile();
@@ -147,24 +149,46 @@ const Chat = () => {
 
       if (!convo) return;
 
-      // Fetch materials for this assignment, prioritize "questions" type
-      const { data: materials } = await supabase
+      // Fetch ALL materials for this assignment, excluding answer keys for students
+      let query = supabase
         .from("materials")
         .select("id, storage_path, kind, title")
         .eq("assignment_id", convo.assignment_id)
-        .eq("text_extracted", true)
-        .order("kind", { ascending: true }); // questions comes before answers alphabetically
+        .eq("text_extracted", true);
+
+      // Filter out answer keys for students (only teachers can see them)
+      if (userRole === "student") {
+        query = query.neq("kind", "answers");
+      }
+
+      const { data: materials } = await query.order("kind", { ascending: true });
 
       if (materials && materials.length > 0) {
-        // Prioritize questions type
-        const questionMaterial = materials.find(m => m.kind === "questions" || m.kind === "questions_with_answers") || materials[0];
-        
-        const { data: signedUrl } = await supabase.storage
-          .from("materials")
-          .createSignedUrl(questionMaterial.storage_path, 3600);
+        // Generate signed URLs for all materials
+        const pdfsWithUrls = await Promise.all(
+          materials.map(async (material) => {
+            const { data: signedUrl } = await supabase.storage
+              .from("materials")
+              .createSignedUrl(material.storage_path, 3600);
 
-        if (signedUrl) {
-          setPdfUrl(signedUrl.signedUrl);
+            return {
+              id: material.id,
+              title: material.title,
+              url: signedUrl?.signedUrl || "",
+              kind: material.kind,
+            };
+          })
+        );
+
+        const validPdfs = pdfsWithUrls.filter(pdf => pdf.url);
+        setAvailablePdfs(validPdfs);
+
+        // Set default PDF (prioritize questions type)
+        if (validPdfs.length > 0) {
+          const questionPdf = validPdfs.find(p => p.kind === "questions" || p.kind === "questions_with_answers");
+          const defaultIndex = questionPdf ? validPdfs.indexOf(questionPdf) : 0;
+          setSelectedPdfIndex(defaultIndex);
+          setPdfUrl(validPdfs[defaultIndex].url);
         }
       }
     } catch (error) {
@@ -410,15 +434,37 @@ const Chat = () => {
               </div>
             </TabsContent>
             <TabsContent value="assignment" className="flex-1 overflow-hidden mt-0">
-              <div className="h-full p-6">
+              <div className="h-full p-6 flex flex-col">
+                {availablePdfs.length > 1 && (
+                  <Select 
+                    value={selectedPdfIndex.toString()} 
+                    onValueChange={(val) => {
+                      const idx = parseInt(val);
+                      setSelectedPdfIndex(idx);
+                      setPdfUrl(availablePdfs[idx].url);
+                    }}
+                    disabled={loadingPdf}
+                  >
+                    <SelectTrigger className="w-full mb-4">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {availablePdfs.map((pdf, idx) => (
+                        <SelectItem key={pdf.id} value={idx.toString()}>
+                          {pdf.title}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
                 {loadingPdf ? (
-                  <div className="h-full flex items-center justify-center">
+                  <div className="flex-1 flex items-center justify-center">
                     <p className="text-muted-foreground">Loading assignment PDF...</p>
                   </div>
                 ) : pdfUrl ? (
-                  <iframe src={pdfUrl} className="w-full h-full border rounded-lg" title="Assignment PDF" />
+                  <iframe src={pdfUrl} className="flex-1 w-full border rounded-lg" title="Assignment PDF" />
                 ) : (
-                  <div className="h-full flex items-center justify-center">
+                  <div className="flex-1 flex items-center justify-center">
                     <div className="text-center space-y-2">
                       <FileText className="w-12 h-12 mx-auto text-muted-foreground/40" />
                       <p className="text-muted-foreground">No assignment PDF available</p>
@@ -432,7 +478,30 @@ const Chat = () => {
           <ResizablePanelGroup direction="horizontal" className="h-full">
             <ResizablePanel defaultSize={50} minSize={30}>
               <div className="h-full flex flex-col p-6">
-                <h2 className="text-lg font-semibold mb-4">Assignment</h2>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-semibold">Assignment</h2>
+                  {availablePdfs.length > 1 && (
+                    <Select 
+                      value={selectedPdfIndex.toString()} 
+                      onValueChange={(val) => {
+                        const idx = parseInt(val);
+                        setSelectedPdfIndex(idx);
+                        setPdfUrl(availablePdfs[idx].url);
+                      }}
+                    >
+                      <SelectTrigger className="w-64">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {availablePdfs.map((pdf, idx) => (
+                          <SelectItem key={pdf.id} value={idx.toString()}>
+                            {pdf.title}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
                 {loadingPdf ? (
                   <div className="flex-1 flex items-center justify-center">
                     <p className="text-muted-foreground">Loading PDF...</p>
