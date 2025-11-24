@@ -1,108 +1,66 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const corsHeaders = {
+const cors = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
+  if (req.method === "OPTIONS") return new Response(null, { headers: cors });
 
   try {
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
-
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    if (req.method !== "POST") {
+      return new Response(JSON.stringify({ error: "Method not allowed" }), { status: 405, headers: { ...cors, "Content-Type": "application/json" } });
     }
 
-    const token = authHeader.replace("Bearer ", "");
-    const { data: userData, error: userError } = await supabase.auth.getUser(token);
-    if (userError || !userData.user) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    const url = Deno.env.get("SUPABASE_URL")!;
+    const key = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const admin = createClient(url, key);
+
+    const auth = req.headers.get("Authorization") || "";
+    const token = auth.replace("Bearer ", "");
+    const { data: u } = await admin.auth.getUser(token);
+    const uid = u?.user?.id;
+    if (!uid) return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...cors, "Content-Type": "application/json" } });
+
+    const { courseId, assignmentId, filename, title, kind, fileSize } = await req.json();
+
+    if (!courseId || !filename || !title || !kind) {
+      return new Response(JSON.stringify({ error: "Missing fields" }), { status: 400, headers: { ...cors, "Content-Type": "application/json" } });
+    }
+    if (!filename.toLowerCase().endsWith(".pdf")) {
+      return new Response(JSON.stringify({ error: "Only PDF files are allowed" }), { status: 400, headers: { ...cors, "Content-Type": "application/json" } });
     }
 
-    const userId = userData.user.id;
-
-    if (req.method === "POST") {
-      const { courseId, assignmentId, filename } = await req.json();
-
-      if (!courseId || !filename) {
-        return new Response(JSON.stringify({ error: "courseId and filename required" }), {
-          status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-
-      // Verify teacher owns the course
-      const { data: course } = await supabase
-        .from("courses")
-        .select("teacher_id")
-        .eq("id", courseId)
-        .maybeSingle();
-
-      if (!course || course.teacher_id !== userId) {
-        return new Response(JSON.stringify({ error: "Not authorized for this course" }), {
-          status: 403,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-
-      // Generate unique filename
-      const fileId = crypto.randomUUID();
-      const storagePath = assignmentId
-        ? `${courseId}/${assignmentId}/${fileId}.pdf`
-        : `${courseId}/course/${fileId}.pdf`;
-
-      // Create signed upload URL
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from("materials")
-        .createSignedUploadUrl(storagePath);
-
-      if (uploadError) {
-        console.error("Upload URL error:", uploadError);
-        return new Response(JSON.stringify({ error: "Failed to create upload URL" }), {
-          status: 500,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-
-      return new Response(
-        JSON.stringify({
-          uploadUrl: uploadData.signedUrl,
-          storagePath,
-          token: uploadData.token,
-        }),
-        {
-          status: 200,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
-      );
+    // teacher owns course
+    const { data: course } = await admin.from("courses").select("id, teacher_id").eq("id", courseId).maybeSingle();
+    if (!course || course.teacher_id !== uid) {
+      return new Response(JSON.stringify({ error: "Not authorized for this course" }), { status: 403, headers: { ...cors, "Content-Type": "application/json" } });
     }
 
-    return new Response(JSON.stringify({ error: "Method not allowed" }), {
-      status: 405,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    const id = crypto.randomUUID();
+    const segment = assignmentId ?? "course";
+    const storagePath = `${courseId}/${segment}/${id}.pdf`;
+
+    const { data: signed, error: signErr } = await admin.storage.from("materials").createSignedUploadUrl(storagePath, { upsert: true });
+    if (signErr || !signed?.signedUrl) {
+      console.error("Upload URL error:", signErr);
+      return new Response(JSON.stringify({ error: "Could not create upload URL" }), { status: 500, headers: { ...cors, "Content-Type": "application/json" } });
+    }
+
+    const { error: insErr } = await admin.from("materials").insert({
+      id, course_id: courseId, assignment_id: assignmentId ?? null, title, kind,
+      storage_path: storagePath, file_size: fileSize ?? null, created_by: uid, text_extracted: false
     });
-  } catch (err) {
-    console.error("materials-upload error:", err);
-    return new Response(
-      JSON.stringify({ error: err instanceof Error ? err.message : "Unknown error" }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
-    );
+    if (insErr) {
+      console.error("DB insert error:", insErr);
+      return new Response(JSON.stringify({ error: "Could not create DB row" }), { status: 500, headers: { ...cors, "Content-Type": "application/json" } });
+    }
+
+    return new Response(JSON.stringify({ materialId: id, uploadUrl: signed.signedUrl, storagePath }), { status: 200, headers: { ...cors, "Content-Type": "application/json" } });
+  } catch (e) {
+    console.error("materials-upload error", e);
+    return new Response(JSON.stringify({ error: "Server error" }), { status: 500, headers: { ...cors, "Content-Type": "application/json" } });
   }
 });
