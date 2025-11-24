@@ -153,8 +153,7 @@ const Chat = () => {
       let query = supabase
         .from("materials")
         .select("id, storage_path, kind, title")
-        .eq("assignment_id", convo.assignment_id)
-        .eq("text_extracted", true);
+        .eq("assignment_id", convo.assignment_id);
 
       // Filter out answer keys for students (only teachers can see them)
       if (userRole === "student") {
