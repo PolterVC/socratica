@@ -55,6 +55,15 @@ serve(async (req) => {
       .order("created_at", { ascending: true })
       .limit(20);
 
+    // Clean up any malformed messages in history that contain JSON metadata
+    const cleanedHistory = (hist || []).map((msg) => {
+      let cleanText = msg.text;
+      // Remove any trailing JSON structure that might have been accidentally stored
+      const jsonPattern = /\s*\{"tutor_reply"[\s\S]*"metadata"[\s\S]*\}\s*$/;
+      cleanText = cleanText.replace(jsonPattern, "");
+      return { sender: msg.sender, text: cleanText };
+    });
+
     // Retrieval query - prefer assignment materials, then course materials
     const assignment = Array.isArray(convo.assignments) ? convo.assignments[0] : convo.assignments;
     const assignmentTitle = assignment?.title ?? "";
@@ -175,7 +184,7 @@ Set confidence 0.0 to 1.0 based on how well the context matches the student's qu
         temperature: 0.4,
         messages: [
           { role: "system", content: system },
-          ...(hist || []).map((m) => ({ role: m.sender === "student" ? "user" : "assistant", content: m.text })),
+          ...cleanedHistory.map((m) => ({ role: m.sender === "student" ? "user" : "assistant", content: m.text })),
           { role: "user", content: message },
         ],
       }),
@@ -188,7 +197,7 @@ Set confidence 0.0 to 1.0 based on how well the context matches the student's qu
         temperature: 0.4,
         messages: [
           { role: "system", content: system },
-          ...(hist || []).map((m) => ({ role: m.sender === "student" ? "user" : "assistant", content: m.text })),
+          ...cleanedHistory.map((m) => ({ role: m.sender === "student" ? "user" : "assistant", content: m.text })),
           { role: "user", content: message },
         ],
       }),
