@@ -106,29 +106,21 @@ const Landing = () => {
                 </p>
               </div>
               <div className="rounded-lg overflow-hidden border border-border shadow-lg bg-background">
-                <img 
-                  src={analyticsScreenshot} 
-                  alt="Analytics dashboard showing student engagement metrics and confusion topics"
-                  className="w-full h-auto"
-                />
+                <img src={analyticsScreenshot} alt="Analytics dashboard showing student engagement metrics and confusion topics" className="w-full h-auto" />
               </div>
             </div>
 
             {/* Chat Interface */}
             <div className="grid md:grid-cols-2 gap-16 items-center">
               <div className="order-2 md:order-1 rounded-lg overflow-hidden border border-border shadow-lg bg-background">
-                <img 
-                  src={chatScreenshot} 
-                  alt="Student chat interface with PDF assignment and Socratic tutoring"
-                  className="w-full h-auto"
-                />
+                <img src={chatScreenshot} alt="Student chat interface with PDF assignment and Socratic tutoring" className="w-full h-auto" />
               </div>
               <div className="order-1 md:order-2 space-y-4">
                 <h3 className="font-serif text-3xl font-bold text-foreground">
                   Guided learning, not answers
                 </h3>
                 <p className="text-lg text-muted-foreground leading-relaxed">
-                  Students work alongside their assignment materials while the AI tutor asks clarifying questions. No direct solutions—just Socratic guidance that builds critical thinking and problem-solving skills.
+                  Students work alongside their assignment materials while the AI tutor asks clarifying questions. No direct solutions, just Socratic guidance that builds critical thinking and problem-solving skills.
                 </p>
               </div>
             </div>
