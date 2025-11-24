@@ -6,8 +6,6 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import mcgillLogo from "@/assets/mcgill-logo.png";
 import udemLogo from "@/assets/udem-logo.png";
-import lavalLogo from "@/assets/laval-logo.png";
-import uoftLogo from "@/assets/uoft-logo.png";
 import concordiaLogo from "@/assets/concordia-logo.png";
 
 const Landing = () => {
@@ -71,14 +69,10 @@ const Landing = () => {
             <div className="flex animate-[scroll_30s_linear_infinite] gap-16 md:gap-24">
               <img src={mcgillLogo} alt="McGill University" className="h-20 object-contain opacity-80 hover:opacity-100 transition-opacity" />
               <img src={udemLogo} alt="Université de Montréal" className="h-20 object-contain opacity-80 hover:opacity-100 transition-opacity" />
-              <img src={lavalLogo} alt="Université Laval" className="h-20 object-contain opacity-80 hover:opacity-100 transition-opacity" />
-              <img src={uoftLogo} alt="University of Toronto" className="h-20 object-contain opacity-80 hover:opacity-100 transition-opacity" />
               <img src={concordiaLogo} alt="Concordia University" className="h-20 object-contain opacity-80 hover:opacity-100 transition-opacity" />
               {/* Duplicate for seamless loop */}
               <img src={mcgillLogo} alt="McGill University" className="h-20 object-contain opacity-80 hover:opacity-100 transition-opacity" />
               <img src={udemLogo} alt="Université de Montréal" className="h-20 object-contain opacity-80 hover:opacity-100 transition-opacity" />
-              <img src={lavalLogo} alt="Université Laval" className="h-20 object-contain opacity-80 hover:opacity-100 transition-opacity" />
-              <img src={uoftLogo} alt="University of Toronto" className="h-20 object-contain opacity-80 hover:opacity-100 transition-opacity" />
               <img src={concordiaLogo} alt="Concordia University" className="h-20 object-contain opacity-80 hover:opacity-100 transition-opacity" />
             </div>
           </div>
