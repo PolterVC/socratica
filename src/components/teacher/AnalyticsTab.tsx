@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { AlertCircle, TrendingUp, Users, BarChart3, CheckCircle } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
+import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
 
 interface Course {
   id: string;
@@ -214,28 +215,36 @@ const AnalyticsTab = ({ userId }: { userId: string }) => {
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg">Confusion by Question</CardTitle>
-                <CardDescription>Which questions generate the most confusion</CardDescription>
+                <CardDescription>Questions generating the most help requests</CardDescription>
               </CardHeader>
               <CardContent>
                 {analytics.confusedByQuestion.length > 0 ? (
-                  <div className="space-y-3">
-                    {analytics.confusedByQuestion.map((item) => {
-                      const percentage = Math.round((item.count / item.total) * 100);
-                      return (
-                        <div key={item.question} className="space-y-1.5">
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="font-medium">Question {item.question}</span>
-                            <span className="text-muted-foreground">
-                              {item.count} confused ({percentage}%)
-                            </span>
-                          </div>
-                          <Progress value={percentage} className="h-2" />
-                        </div>
-                      );
-                    })}
-                  </div>
+                  <ResponsiveContainer width="100%" height={320}>
+                    <BarChart 
+                      data={analytics.confusedByQuestion.slice(0, 8)} 
+                      layout="vertical"
+                      margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
+                      <XAxis type="number" />
+                      <YAxis 
+                        type="category" 
+                        dataKey="question" 
+                        tickFormatter={(value) => `Q${value}`}
+                      />
+                      <Tooltip 
+                        formatter={(value: any) => [`${value} confused`, 'Count']}
+                        labelFormatter={(label) => `Question ${label}`}
+                      />
+                      <Bar 
+                        dataKey="count" 
+                        fill="#ED1B2F" 
+                        radius={[0, 4, 4, 0]}
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
                 ) : (
-                  <div className="h-[200px] flex items-center justify-center">
+                  <div className="h-[320px] flex items-center justify-center">
                     <p className="text-sm text-muted-foreground">No confusion data available</p>
                   </div>
                 )}
@@ -244,34 +253,86 @@ const AnalyticsTab = ({ userId }: { userId: string }) => {
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Topics by Impact</CardTitle>
-                <CardDescription>Concepts causing the most confusion</CardDescription>
+                <CardTitle className="text-lg">Topics Distribution</CardTitle>
+                <CardDescription>Breakdown of confused topics</CardDescription>
               </CardHeader>
               <CardContent>
                 {analytics.topicsByImpact.length > 0 ? (
-                  <div className="space-y-3">
-                    {analytics.topicsByImpact.map((item, idx) => (
-                      <div key={idx} className="space-y-1.5">
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="font-medium truncate flex-1" title={item.topic}>
-                            {item.topic}
-                          </span>
-                          <span className="text-muted-foreground ml-2">
-                            {item.confusedCount} confused ({item.impactPercent}%)
-                          </span>
-                        </div>
-                        <Progress value={item.impactPercent} className="h-2" />
-                      </div>
-                    ))}
-                  </div>
+                  <ResponsiveContainer width="100%" height={320}>
+                    <PieChart>
+                      <Pie
+                        data={analytics.topicsByImpact}
+                        dataKey="confusedCount"
+                        nameKey="topic"
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={100}
+                        label={({ topic, percent }) => 
+                          `${topic.length > 15 ? topic.substring(0, 15) + '...' : topic} (${(percent * 100).toFixed(0)}%)`
+                        }
+                        labelLine={{ stroke: 'hsl(var(--foreground))', strokeWidth: 1 }}
+                      >
+                        {analytics.topicsByImpact.map((_, index) => (
+                          <Cell 
+                            key={`cell-${index}`} 
+                            fill={[
+                              '#ED1B2F', 
+                              '#DC2626', 
+                              '#B91C1C', 
+                              '#991B1B', 
+                              '#7F1D1D'
+                            ][index % 5]} 
+                          />
+                        ))}
+                      </Pie>
+                      <Tooltip 
+                        formatter={(value: any, name: any) => [`${value} confused`, name]}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
                 ) : (
-                  <div className="h-[200px] flex items-center justify-center">
+                  <div className="h-[320px] flex items-center justify-center">
                     <p className="text-sm text-muted-foreground">No topic data available</p>
                   </div>
                 )}
               </CardContent>
             </Card>
           </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Impact Analysis</CardTitle>
+              <CardDescription>Confusion rate by topic</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {analytics.topicsByImpact.length > 0 ? (
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={analytics.topicsByImpact}>
+                    <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
+                    <XAxis 
+                      dataKey="topic" 
+                      angle={-45}
+                      textAnchor="end"
+                      height={100}
+                      interval={0}
+                      tick={{ fontSize: 12 }}
+                    />
+                    <YAxis 
+                      label={{ value: 'Messages', angle: -90, position: 'insideLeft' }}
+                    />
+                    <Tooltip />
+                    <Legend />
+                    <Bar dataKey="count" name="Total Messages" fill="hsl(var(--muted))" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="confusedCount" name="Confused Messages" fill="#ED1B2F" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-[300px] flex items-center justify-center">
+                  <p className="text-sm text-muted-foreground">No impact data available</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
           <Card>
             <CardHeader>
