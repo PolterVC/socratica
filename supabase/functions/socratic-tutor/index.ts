@@ -71,46 +71,46 @@ serve(async (req) => {
 
     let rows: Array<{ content: string; title: string; kind: string }> = [];
 
-    // STEP 1: Get ALL question chunks first (ordered by chunk_index) so tutor knows the full assignment
-    const { data: questionMats } = await admin
+    // STEP 1: Get ALL chunks from this assignment (all materials, all kinds, ordered by chunk_index)
+    // This ensures the tutor has COMPLETE access to the entire assignment document
+    const { data: allAssignmentMats, error: allErr } = await admin
       .from("material_text")
-      .select("content, chunk_index, materials!inner(title, kind, course_id, assignment_id)")
+      .select("content, chunk_index, materials!inner(title, kind, course_id, assignment_id, text_extracted)")
       .eq("materials.course_id", convo.course_id)
       .eq("materials.assignment_id", convo.assignment_id)
       .eq("materials.text_extracted", true)
-      .eq("materials.kind", "questions")
       .order("chunk_index", { ascending: true })
-      .limit(15);
+      .limit(50);
 
-    if (questionMats && questionMats.length > 0) {
-      rows = questionMats.map((r: any) => ({
+    console.log("Assignment materials query:", {
+      course_id: convo.course_id,
+      assignment_id: convo.assignment_id,
+      chunks_found: allAssignmentMats?.length || 0,
+      error: allErr,
+    });
+
+    if (allAssignmentMats && allAssignmentMats.length > 0) {
+      rows = allAssignmentMats.map((r: any) => ({
         content: r.content,
         title: r.materials.title,
         kind: r.materials.kind,
       }));
     }
 
-    // STEP 2: Add semantically relevant chunks from other materials (answers, slides, references)
-    const { data: otherMats } = await admin
-      .from("material_text")
-      .select("content, materials!inner(title, kind, course_id, assignment_id)")
-      .eq("materials.course_id", convo.course_id)
-      .eq("materials.assignment_id", convo.assignment_id)
-      .eq("materials.text_extracted", true)
-      .neq("materials.kind", "questions")
-      .textSearch("tsv", message, { type: "websearch", config: "english" })
-      .limit(8);
-
-    if (otherMats && otherMats.length > 0) {
-      rows = rows.concat(otherMats.map((r: any) => ({
-        content: r.content,
-        title: r.materials.title,
-        kind: r.materials.kind,
-      })));
-    }
-
-    // STEP 3: If still no content, fallback to course materials using semantic search
+    // STEP 2: If no assignment materials found, check what materials exist
     if (rows.length === 0) {
+      const { data: matCheck } = await admin
+        .from("materials")
+        .select("id, title, kind, text_extracted, assignment_id")
+        .eq("course_id", convo.course_id)
+        .eq("assignment_id", convo.assignment_id);
+
+      console.log("Materials check:", {
+        materials_found: matCheck?.length || 0,
+        materials: matCheck,
+      });
+
+      // Fallback to course materials using semantic search
       const { data: courseMats } = await admin
         .from("material_text")
         .select("content, materials!inner(title, kind, course_id, assignment_id)")
@@ -118,9 +118,9 @@ serve(async (req) => {
         .is("materials.assignment_id", null)
         .eq("materials.text_extracted", true)
         .textSearch("tsv", message, { type: "websearch", config: "english" })
-        .limit(10);
+        .limit(15);
 
-      if (courseMats) {
+      if (courseMats && courseMats.length > 0) {
         rows = courseMats.map((r: any) => ({
           content: r.content,
           title: r.materials.title,
