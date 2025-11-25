@@ -4,6 +4,7 @@ import { useEffect } from "react";
 const Privacy = () => {
   useEffect(() => {
     document.title = "Privacy Policy - Socratica";
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
   return (
