@@ -1,7 +1,8 @@
 import * as pdfjsLib from "pdfjs-dist";
+import pdfWorker from "pdfjs-dist/build/pdf.worker.min.mjs?url";
 
-// Use jsDelivr CDN for worker (more reliable than cdnjs)
-pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.js`;
+// Use bundled ESM worker via Vite ?url import to avoid external CDN issues
+(pdfjsLib as any).GlobalWorkerOptions.workerSrc = pdfWorker as string;
 
 export async function extractTextFromPDF(file: File): Promise<{ chunks: string[]; pageCount: number }> {
   const buf = await file.arrayBuffer();
