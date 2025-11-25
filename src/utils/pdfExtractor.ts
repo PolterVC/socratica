@@ -1,5 +1,10 @@
 import * as pdfjsLib from "pdfjs-dist";
-pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+
+// Use locally bundled worker instead of CDN to avoid 404 errors
+pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+  'pdfjs-dist/build/pdf.worker.min.js',
+  import.meta.url
+).toString();
 
 export async function extractTextFromPDF(file: File): Promise<{ chunks: string[]; pageCount: number }> {
   const buf = await file.arrayBuffer();
