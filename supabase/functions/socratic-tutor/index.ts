@@ -248,14 +248,13 @@ BAD RESPONSES (Avoid These):
       }
     ];
 
-    console.log("Calling LLM with openai/gpt-5, temperature 0.5, tool calling enabled");
+    console.log("Calling LLM with openai/gpt-5, default temperature (1.0), tool calling enabled");
     
     const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
         model: "openai/gpt-5",
-        temperature: 0.5,
         messages: [
           { role: "system", content: system },
           ...cleanedHistory.map((m) => ({ role: m.sender === "student" ? "user" : "assistant", content: m.text })),
