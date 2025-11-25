@@ -182,25 +182,31 @@ const CoursesTab = ({ userId }: { userId: string }) => {
             throw new Error("Assignment file upload failed");
           }
 
-          const { chunks } = await extractTextFromPDF(assignmentFile);
-          console.log("Extracted chunks:", chunks.length);
+          // File upload succeeded - now try text extraction
+          try {
+            const { chunks } = await extractTextFromPDF(assignmentFile);
+            console.log("Extracted chunks:", chunks.length);
 
-          const { error: textError } = await supabase.functions.invoke(
-            "materials-text",
-            {
-              body: {
-                materialId: uploadData.materialId,
-                chunks,
-              },
+            const { error: textError } = await supabase.functions.invoke(
+              "materials-text",
+              {
+                body: {
+                  materialId: uploadData.materialId,
+                  chunks,
+                },
+              }
+            );
+
+            if (textError) {
+              console.error("Text extraction error:", textError);
+              toast.warning("File uploaded successfully, but text extraction had issues");
+            } else {
+              toast.success("Assignment and file uploaded successfully");
             }
-          );
-
-          if (textError) {
-            console.error("Text extraction error:", textError);
-            throw textError;
+          } catch (extractErr) {
+            console.error("Text extraction error:", extractErr);
+            toast.warning("File uploaded successfully, but text extraction failed");
           }
-
-          toast.success("Assignment and file uploaded successfully");
         } catch (fileErr) {
           console.error("Assignment file upload error:", fileErr);
           toast.error(
