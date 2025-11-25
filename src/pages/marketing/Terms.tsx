@@ -4,6 +4,7 @@ import { useEffect } from "react";
 const Terms = () => {
   useEffect(() => {
     document.title = "Terms of Service - Socratica";
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
   return (
