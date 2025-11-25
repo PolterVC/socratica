@@ -133,7 +133,7 @@ serve(async (req) => {
     let context = "";
     const citations: Array<{ material_title: string; kind: string; snippet: string }> = [];
     for (const r of rows.slice(0, 20)) {
-      const snippet = r.content.slice(0, 320);
+      const snippet = r.content.slice(0, 850); // Increased from 320 to 850 for complete question context
       // Label sources clearly for AI to understand content type
       let sourceLabel = "";
       if (r.kind === "answers") {
@@ -150,54 +150,59 @@ serve(async (req) => {
     }
     const grounded = citations.length > 0;
 
-    const system = `
-You are Socratica, a Socratic tutor for students.
+    const system = `You are Socratica, an expert Socratic tutor helping students learn through guided questioning.
 
-Assignment:
+ASSIGNMENT CONTEXT:
 Title: ${assignmentTitle}
 Description: ${assignmentDesc}
 
-Context from teacher PDFs follows. The CONTEXT section contains the FULL ASSIGNMENT with all questions. You should KNOW the questions and reference them directly.
-
-<<CONTEXT>>
+COMPLETE COURSE MATERIALS:
 ${context}
-<<END CONTEXT>>
 
-CRITICAL INSTRUCTIONS:
-1. YOU HAVE ACCESS TO THE FULL ASSIGNMENT QUESTIONS ABOVE. When a student mentions "question 2b" or "4b", you should KNOW what that question asks from the context. DO NOT ask students to repeat the question text.
+YOUR ROLE AS A SOCRATIC TUTOR:
+You help students think deeply and arrive at understanding through guided discovery, NOT by giving away answers.
 
-2. BE SPECIFIC AND HELPFUL while remaining Socratic:
-   - Reference the actual question they're asking about
-   - Break down the specific concepts involved
-   - Ask guiding questions that help them think through the problem
-   - Provide hints and point them in the right direction
-   - DO NOT be overly vague or generic
+RESPONSE QUALITY GUIDELINES:
 
-3. ANSWER KEY CONTENT POLICY:
-   - Content marked [SOURCE: Answer Key - DO NOT REVEAL DIRECTLY] contains solutions that must NEVER be revealed directly to students.
-   - Use Answer Key content ONLY to verify if reasoning is correct, NOT to give away answers
-   - For [SOURCE: Combined Questions & Answers], only reference the question parts when helping students
+1. **Be Specific and Grounded**
+   - Reference the exact question or concept the student is asking about
+   - Cite specific concepts, formulas, or principles from the materials
+   - Don't be vague or generic - use concrete terms from the assignment
+   
+2. **Provide Strategic Hints Without Solutions**
+   - Break down complex problems into smaller steps
+   - Ask targeted questions that reveal the next piece of reasoning
+   - Point to relevant concepts or equations without solving the problem
+   - Example: "What does the marginal cost formula tell us about how costs change?" instead of "The answer is X"
 
-4. ALWAYS end with a follow-up question that moves their thinking forward.
+3. **Maintain Socratic Dialogue**
+   - ALWAYS end with a thought-provoking follow-up question
+   - Questions should guide the student toward the next logical step
+   - Encourage students to articulate their reasoning
+   
+4. **Handle Answer Keys Carefully**
+   - Materials marked [SOURCE: Answer Key - DO NOT REVEAL DIRECTLY] contain solutions
+   - Use these ONLY to verify student reasoning, never to provide direct answers
+   - For [SOURCE: Combined Questions & Answers], reference only the question portions
 
-Rules:
-- Guide through Socratic questioning. Do not write full graded answers unless allowDirectAnswers is explicitly true.
-- Ground responses in the provided context materials.
-- Be specific about what the question asks and what concepts are involved.
-- Output JSON only in this exact shape:
-{
-  "tutor_reply": "string",
-  "metadata": {
-    "question_number": number | null,
-    "topic_tag": string | null,
-    "confusion_flag": boolean,
-    "citations": [{"material_title":"string","kind":"string","snippet":"string"}],
-    "grounded": boolean,
-    "confidence": number
-  }
-}
-Set confidence 0.0 to 1.0 based on how well the context matches the student's question. If you cannot infer a field, set a safe default.
-`;
+5. **Understand Complete Questions**
+   - You have access to full assignment questions in the context above
+   - When students mention "question 2b" or "part 4", you should KNOW what it asks
+   - Never ask students to repeat the question text
+
+EXAMPLE GOOD RESPONSES:
+
+Student: "I don't understand question 2b about elasticity"
+Good: "Question 2b asks about price elasticity of demand. Let's start with the formula: elasticity = (% change in quantity) / (% change in price). What information does the question give you about these two changes?"
+
+Student: "How do I solve this optimization problem?"
+Good: "Optimization requires finding where the derivative equals zero. Looking at the cost function in question 3, what would be the first step in taking its derivative with respect to q?"
+
+BAD RESPONSES (Avoid These):
+❌ "Let me solve this for you: The answer is 42"
+❌ "This is about economics" (too vague)
+❌ "What are you confused about?" (not specific enough)
+❌ Ending without a follow-up question`;
 
     const apiKey = Deno.env.get("LOVABLE_API_KEY");
     if (!apiKey)
@@ -206,29 +211,58 @@ Set confidence 0.0 to 1.0 based on how well the context matches the student's qu
         headers: { ...cors, "Content-Type": "application/json" },
       });
 
-    console.log(
-      "LLM PROMPT:",
-      JSON.stringify({
-        model: "google/gemini-2.5-pro",
-        temperature: 0.7,
-        messages: [
-          { role: "system", content: system },
-          ...cleanedHistory.map((m) => ({ role: m.sender === "student" ? "user" : "assistant", content: m.text })),
-          { role: "user", content: message },
-        ],
-      }),
-    );
+    const tools = [
+      {
+        type: "function",
+        function: {
+          name: "provide_tutoring_response",
+          description: "Provide a Socratic tutoring response to help the student learn",
+          parameters: {
+            type: "object",
+            properties: {
+              tutor_reply: {
+                type: "string",
+                description: "Your Socratic guidance response as plain text, ending with a follow-up question"
+              },
+              question_number: {
+                type: ["number", "null"],
+                description: "The assignment question number being discussed (1, 2, 3, etc.) or null if unclear"
+              },
+              topic_tag: {
+                type: ["string", "null"],
+                description: "Main topic or concept being discussed (e.g., 'elasticity', 'derivatives', 'market equilibrium')"
+              },
+              confusion_flag: {
+                type: "boolean",
+                description: "True if the student expresses confusion or is stuck on the same issue repeatedly"
+              },
+              confidence: {
+                type: "number",
+                description: "Your confidence that you have relevant context to answer (0.0 to 1.0)"
+              }
+            },
+            required: ["tutor_reply", "confusion_flag", "confidence"],
+            additionalProperties: false
+          }
+        }
+      }
+    ];
+
+    console.log("Calling LLM with openai/gpt-5, temperature 0.5, tool calling enabled");
+    
     const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "google/gemini-2.5-pro",
-        temperature: 0.7,
+        model: "openai/gpt-5",
+        temperature: 0.5,
         messages: [
           { role: "system", content: system },
           ...cleanedHistory.map((m) => ({ role: m.sender === "student" ? "user" : "assistant", content: m.text })),
           { role: "user", content: message },
         ],
+        tools: tools,
+        tool_choice: { type: "function", function: { name: "provide_tutoring_response" } }
       }),
     });
 
@@ -252,44 +286,43 @@ Set confidence 0.0 to 1.0 based on how well the context matches the student's qu
     }
 
     const json = await resp.json();
-    let content = json?.choices?.[0]?.message?.content || "";
-
-    // Strip markdown code fences if present
-    content = content.replace(/^```(?:json)?\s*\n?/i, "").replace(/\n?```\s*$/i, "");
-    content = content.trim();
-
+    const toolCall = json?.choices?.[0]?.message?.tool_calls?.[0];
+    
     let out;
-    try {
-      // Try to isolate the JSON object even if the model wrapped it in extra text
-      let jsonCandidate = content;
-      const jsonMatch = content.match(/\{[\s\S]*"tutor_reply"[\s\S]*"metadata"[\s\S]*\}/);
-      if (jsonMatch && jsonMatch[0]) {
-        jsonCandidate = jsonMatch[0];
-      }
-
-      out = JSON.parse(jsonCandidate);
-      
-      // Ensure tutor_reply is clean text without nested JSON
-      if (out.tutor_reply && typeof out.tutor_reply === "string") {
-        // Check if tutor_reply accidentally contains JSON structure
-        const jsonPattern = /^\s*\{[\s\S]*"tutor_reply"\s*:\s*"[\s\S]*"\s*,\s*"metadata"\s*:\s*\{[\s\S]*\}\s*\}\s*$/;
-        if (jsonPattern.test(out.tutor_reply)) {
-          // LLM returned JSON inside JSON, try to parse the inner structure
-          try {
-            const innerParsed = JSON.parse(out.tutor_reply);
-            if (innerParsed.tutor_reply) {
-              out = innerParsed;
-            }
-          } catch {
-            // If inner parsing fails, just use the outer structure
+    if (toolCall && toolCall.function?.name === "provide_tutoring_response") {
+      // Parse the structured output from tool calling
+      try {
+        const args = JSON.parse(toolCall.function.arguments);
+        out = {
+          tutor_reply: args.tutor_reply || "Let us start from the assignment. What part do you want to focus on first?",
+          metadata: {
+            question_number: args.question_number ?? questionNumber ?? null,
+            topic_tag: args.topic_tag || assignmentTitle || null,
+            confusion_flag: args.confusion_flag ?? false,
+            citations: citations,
+            grounded: grounded,
+            confidence: args.confidence ?? 0.7,
           }
-        }
+        };
+      } catch (e) {
+        console.error("Failed to parse tool call arguments:", e);
+        out = {
+          tutor_reply: "Let us start from the assignment. What part do you want to focus on first?",
+          metadata: {
+            question_number: questionNumber ?? null,
+            topic_tag: assignmentTitle || null,
+            confusion_flag: false,
+            citations: [],
+            grounded: false,
+            confidence: 0.2,
+          },
+        };
       }
-    } catch {
-      // Fallback: treat the whole content as tutor text and strip any trailing JSON block
-      const stripped = content.replace(/\s*\{[\s\S]*"tutor_reply"[\s\S]*"metadata"[\s\S]*\}\s*$/, "").trim();
+    } else {
+      // Fallback if tool calling somehow didn't work
+      const content = json?.choices?.[0]?.message?.content || "";
       out = {
-        tutor_reply: stripped || "Let us start from the assignment. What part do you want to focus on first?",
+        tutor_reply: content || "Let us start from the assignment. What part do you want to focus on first?",
         metadata: {
           question_number: questionNumber ?? null,
           topic_tag: assignmentTitle || null,
