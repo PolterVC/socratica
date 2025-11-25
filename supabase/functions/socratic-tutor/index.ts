@@ -260,7 +260,14 @@ Set confidence 0.0 to 1.0 based on how well the context matches the student's qu
 
     let out;
     try {
-      out = JSON.parse(content);
+      // Try to isolate the JSON object even if the model wrapped it in extra text
+      let jsonCandidate = content;
+      const jsonMatch = content.match(/\{[\s\S]*"tutor_reply"[\s\S]*"metadata"[\s\S]*\}/);
+      if (jsonMatch && jsonMatch[0]) {
+        jsonCandidate = jsonMatch[0];
+      }
+
+      out = JSON.parse(jsonCandidate);
       
       // Ensure tutor_reply is clean text without nested JSON
       if (out.tutor_reply && typeof out.tutor_reply === "string") {
@@ -279,8 +286,10 @@ Set confidence 0.0 to 1.0 based on how well the context matches the student's qu
         }
       }
     } catch {
+      // Fallback: treat the whole content as tutor text and strip any trailing JSON block
+      const stripped = content.replace(/\s*\{[\s\S]*"tutor_reply"[\s\S]*"metadata"[\s\S]*\}\s*$/, "").trim();
       out = {
-        tutor_reply: content || "Let us start from the assignment. What part do you want to focus on first?",
+        tutor_reply: stripped || "Let us start from the assignment. What part do you want to focus on first?",
         metadata: {
           question_number: questionNumber ?? null,
           topic_tag: assignmentTitle || null,
