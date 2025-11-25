@@ -143,6 +143,8 @@ const CoursesTab = ({ userId }: { userId: string }) => {
       // If a file was attached, upload it as a material linked to this assignment
       if (assignmentFile) {
         try {
+          console.log("Starting file upload for assignment:", assignment.id);
+          
           const { data: uploadData, error: uploadError } =
             await supabase.functions.invoke("materials-upload", {
               body: {
@@ -167,6 +169,7 @@ const CoursesTab = ({ userId }: { userId: string }) => {
             throw new Error("Invalid upload response from server");
           }
 
+          console.log("Uploading file to storage...");
           const uploadResponse = await fetch(uploadData.uploadUrl, {
             method: "PUT",
             body: assignmentFile,
@@ -182,12 +185,20 @@ const CoursesTab = ({ userId }: { userId: string }) => {
             throw new Error("Assignment file upload failed");
           }
 
+          console.log("File uploaded successfully, starting text extraction...");
+          
           // File upload succeeded - now try text extraction
           try {
+            console.log("Extracting text from PDF, file size:", assignmentFile.size);
             const { chunks } = await extractTextFromPDF(assignmentFile);
             console.log("Extracted chunks:", chunks.length);
 
-            const { error: textError } = await supabase.functions.invoke(
+            if (chunks.length === 0) {
+              throw new Error("No text could be extracted from PDF");
+            }
+
+            console.log("Sending chunks to materials-text function...");
+            const { data: textData, error: textError } = await supabase.functions.invoke(
               "materials-text",
               {
                 body: {
@@ -197,6 +208,8 @@ const CoursesTab = ({ userId }: { userId: string }) => {
               }
             );
 
+            console.log("Text extraction response:", { textData, textError });
+
             if (textError) {
               console.error("Text extraction error:", textError);
               toast.warning("File uploaded successfully, but text extraction had issues");
@@ -205,7 +218,7 @@ const CoursesTab = ({ userId }: { userId: string }) => {
             }
           } catch (extractErr) {
             console.error("Text extraction error:", extractErr);
-            toast.warning("File uploaded successfully, but text extraction failed");
+            toast.warning(`File uploaded successfully, but text extraction failed: ${extractErr instanceof Error ? extractErr.message : 'Unknown error'}`);
           }
         } catch (fileErr) {
           console.error("Assignment file upload error:", fileErr);
