@@ -68,28 +68,49 @@ serve(async (req) => {
     const assignment = Array.isArray(convo.assignments) ? convo.assignments[0] : convo.assignments;
     const assignmentTitle = assignment?.title ?? "";
     const assignmentDesc = assignment?.description ?? "";
-    const queryText = [message, assignmentTitle, assignmentDesc].filter(Boolean).join(" ");
 
     let rows: Array<{ content: string; title: string; kind: string }> = [];
 
-    // Get assignment materials first using semantic search (top 7 most relevant chunks)
-    const { data: assignmentMats } = await admin
+    // STEP 1: Get ALL question chunks first (ordered by chunk_index) so tutor knows the full assignment
+    const { data: questionMats } = await admin
+      .from("material_text")
+      .select("content, chunk_index, materials!inner(title, kind, course_id, assignment_id)")
+      .eq("materials.course_id", convo.course_id)
+      .eq("materials.assignment_id", convo.assignment_id)
+      .eq("materials.text_extracted", true)
+      .eq("materials.kind", "questions")
+      .order("chunk_index", { ascending: true })
+      .limit(15);
+
+    if (questionMats && questionMats.length > 0) {
+      rows = questionMats.map((r: any) => ({
+        content: r.content,
+        title: r.materials.title,
+        kind: r.materials.kind,
+      }));
+    }
+
+    // STEP 2: Add semantically relevant chunks from other materials (answers, slides, references)
+    const { data: otherMats } = await admin
       .from("material_text")
       .select("content, materials!inner(title, kind, course_id, assignment_id)")
       .eq("materials.course_id", convo.course_id)
       .eq("materials.assignment_id", convo.assignment_id)
       .eq("materials.text_extracted", true)
+      .neq("materials.kind", "questions")
       .textSearch("tsv", message, { type: "websearch", config: "english" })
-      .limit(7);
+      .limit(8);
 
-    if (assignmentMats && assignmentMats.length > 0) {
-      rows = assignmentMats.map((r: any) => ({
+    if (otherMats && otherMats.length > 0) {
+      rows = rows.concat(otherMats.map((r: any) => ({
         content: r.content,
         title: r.materials.title,
         kind: r.materials.kind,
-      }));
-    } else {
-      // Fallback to course materials using semantic search
+      })));
+    }
+
+    // STEP 3: If still no content, fallback to course materials using semantic search
+    if (rows.length === 0) {
       const { data: courseMats } = await admin
         .from("material_text")
         .select("content, materials!inner(title, kind, course_id, assignment_id)")
@@ -97,7 +118,7 @@ serve(async (req) => {
         .is("materials.assignment_id", null)
         .eq("materials.text_extracted", true)
         .textSearch("tsv", message, { type: "websearch", config: "english" })
-        .limit(7);
+        .limit(10);
 
       if (courseMats) {
         rows = courseMats.map((r: any) => ({
@@ -111,7 +132,7 @@ serve(async (req) => {
     // Build context with explicit source labels and citations
     let context = "";
     const citations: Array<{ material_title: string; kind: string; snippet: string }> = [];
-    for (const r of rows.slice(0, 7)) {
+    for (const r of rows.slice(0, 20)) {
       const snippet = r.content.slice(0, 320);
       // Label sources clearly for AI to understand content type
       let sourceLabel = "";
@@ -136,25 +157,33 @@ Assignment:
 Title: ${assignmentTitle}
 Description: ${assignmentDesc}
 
-Context from teacher PDFs follows. Use this context to guide the student effectively.
+Context from teacher PDFs follows. The CONTEXT section contains the FULL ASSIGNMENT with all questions. You should KNOW the questions and reference them directly.
 
 <<CONTEXT>>
 ${context}
 <<END CONTEXT>>
 
-CRITICAL INSTRUCTIONS FOR ANSWER KEY CONTENT:
-- Content marked [SOURCE: Answer Key - DO NOT REVEAL DIRECTLY] contains solutions that must NEVER be revealed directly to students.
-- Use Answer Key content ONLY to:
-  1. Verify if the student's reasoning is on the right track
-  2. Check if their answer is correct (without revealing why)
-  3. Guide them toward the correct approach without giving away the solution
-- When you see answer key content, respond with guiding questions like "Are you sure about that step?" or "What if you considered...?" instead of revealing the answer.
-- For [SOURCE: Combined Questions & Answers], be very careful to only reference the question parts when helping students.
+CRITICAL INSTRUCTIONS:
+1. YOU HAVE ACCESS TO THE FULL ASSIGNMENT QUESTIONS ABOVE. When a student mentions "question 2b" or "4b", you should KNOW what that question asks from the context. DO NOT ask students to repeat the question text.
+
+2. BE SPECIFIC AND HELPFUL while remaining Socratic:
+   - Reference the actual question they're asking about
+   - Break down the specific concepts involved
+   - Ask guiding questions that help them think through the problem
+   - Provide hints and point them in the right direction
+   - DO NOT be overly vague or generic
+
+3. ANSWER KEY CONTENT POLICY:
+   - Content marked [SOURCE: Answer Key - DO NOT REVEAL DIRECTLY] contains solutions that must NEVER be revealed directly to students.
+   - Use Answer Key content ONLY to verify if reasoning is correct, NOT to give away answers
+   - For [SOURCE: Combined Questions & Answers], only reference the question parts when helping students
+
+4. ALWAYS end with a follow-up question that moves their thinking forward.
 
 Rules:
-- Guide the student through Socratic questioning. Do not write full graded answers unless allowDirectAnswers is explicitly true.
-- Ground your responses in the provided context materials when available.
-- Always end with a follow-up question that moves the student's thinking forward.
+- Guide through Socratic questioning. Do not write full graded answers unless allowDirectAnswers is explicitly true.
+- Ground responses in the provided context materials.
+- Be specific about what the question asks and what concepts are involved.
 - Output JSON only in this exact shape:
 {
   "tutor_reply": "string",
@@ -180,8 +209,8 @@ Set confidence 0.0 to 1.0 based on how well the context matches the student's qu
     console.log(
       "LLM PROMPT:",
       JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        temperature: 0.4,
+        model: "google/gemini-2.5-pro",
+        temperature: 0.7,
         messages: [
           { role: "system", content: system },
           ...cleanedHistory.map((m) => ({ role: m.sender === "student" ? "user" : "assistant", content: m.text })),
@@ -193,8 +222,8 @@ Set confidence 0.0 to 1.0 based on how well the context matches the student's qu
       method: "POST",
       headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        temperature: 0.4,
+        model: "google/gemini-2.5-pro",
+        temperature: 0.7,
         messages: [
           { role: "system", content: system },
           ...cleanedHistory.map((m) => ({ role: m.sender === "student" ? "user" : "assistant", content: m.text })),
