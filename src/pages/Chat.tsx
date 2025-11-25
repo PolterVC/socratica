@@ -350,7 +350,7 @@ const Chat = () => {
                             <div
                               className={`max-w-[75%] rounded-xl px-5 py-4 ${
                                 message.sender === "student"
-                                  ? "bg-primary text-primary-foreground shadow-sm"
+                                  ? "bg-blue-500 text-white shadow-sm"
                                   : "bg-muted/50 border border-border/20"
                               }`}
                             >
@@ -546,7 +546,7 @@ const Chat = () => {
                             <div
                               className={`max-w-[75%] rounded-xl px-5 py-4 ${
                                 message.sender === "student"
-                                  ? "bg-primary text-primary-foreground shadow-sm"
+                                  ? "bg-blue-500 text-white shadow-sm"
                                   : "bg-muted/50 border border-border/20"
                               }`}
                             >
