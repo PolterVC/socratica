@@ -43,7 +43,8 @@ const StudentDashboard = ({ user }: StudentDashboardProps) => {
     const { data: enrollmentsData } = await supabase
       .from('enrollments')
       .select('course_id, courses(*)')
-      .eq('student_id', user.id);
+      .eq('student_id', user.id)
+      .order('created_at', { ascending: false });
 
     const enrolledCourses = enrollmentsData?.map(e => e.courses).filter(Boolean) || [];
     const enrolledCourseIds = enrolledCourses.map(c => c.id);
