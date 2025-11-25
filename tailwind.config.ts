@@ -76,6 +76,13 @@ export default {
         'icon-green': '#00A67E',
         'icon-yellow': '#FFB800',
         'icon-pink': '#FF3EA5',
+        analytics: {
+          confused: 'hsl(var(--analytics-confused))',
+          success: 'hsl(var(--analytics-success))',
+          info: 'hsl(var(--analytics-info))',
+          warning: 'hsl(var(--analytics-warning))',
+          neutral: 'hsl(var(--analytics-neutral))',
+        },
       },
       borderRadius: {
         lg: 'var(--radius)',

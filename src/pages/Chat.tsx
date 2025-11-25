@@ -271,6 +271,7 @@ const Chat = () => {
           question_number: data.metadata?.question_number ?? null,
           topic_tag: data.metadata?.topic_tag ?? null,
           confusion_flag: data.metadata?.confusion_flag ?? false,
+          grounded: data.metadata?.grounded ?? true,
         }).select().single();
 
         // Add materials_referenced to local state (not stored in DB)

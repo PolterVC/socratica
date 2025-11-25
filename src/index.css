@@ -25,6 +25,13 @@
     --input: 220 13% 91%;
     --ring: 354 85% 52%;
     --radius: 0.375rem;
+    
+    /* Analytics colors */
+    --analytics-confused: 0 84% 60%;
+    --analytics-success: 142 76% 36%;
+    --analytics-info: 217 91% 60%;
+    --analytics-warning: 38 92% 50%;
+    --analytics-neutral: 215 16% 47%;
   }
 }
 
