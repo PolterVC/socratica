@@ -12,9 +12,9 @@ serve(async (req) => {
   }
 
   try {
-    const { courseId, assignmentId, from, to } = await req.json();
+    const { courseId, assignmentId } = await req.json();
     
-    console.log('Analytics request:', { courseId, assignmentId, from, to });
+    console.log('Analytics request:', { courseId, assignmentId });
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -23,7 +23,7 @@ serve(async (req) => {
     // Get all conversations for this assignment
     const { data: conversations, error: convError } = await supabase
       .from('conversations')
-      .select('id, student_id')
+      .select('id')
       .eq('course_id', courseId)
       .eq('assignment_id', assignmentId);
 
@@ -35,16 +35,11 @@ serve(async (req) => {
     if (!conversations || conversations.length === 0) {
       return new Response(
         JSON.stringify({
-          kpis: {
-            confused_pct: 0,
-            students_needing_help: 0,
-            top_question: null,
-            top_topic: null,
-            grounded_rate: 100
-          },
-          by_question: [],
-          topics: [],
-          students: []
+          messagesByQuestion: [],
+          messagesByTopic: [],
+          recentMessages: [],
+          confusedMessages: 0,
+          totalMessages: 0
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
@@ -52,22 +47,17 @@ serve(async (req) => {
 
     const conversationIds = conversations.map(c => c.id);
 
-    // Get all messages for these conversations
-    let messagesQuery = supabase
+    // Get all messages for these conversations with student info
+    const { data: messages, error: msgError } = await supabase
       .from('messages')
-      .select('*')
+      .select(`
+        *,
+        conversations!inner(
+          student_id
+        )
+      `)
       .in('conversation_id', conversationIds)
       .order('created_at', { ascending: false });
-
-    // Apply date filters if provided
-    if (from) {
-      messagesQuery = messagesQuery.gte('created_at', from);
-    }
-    if (to) {
-      messagesQuery = messagesQuery.lte('created_at', to);
-    }
-
-    const { data: messages, error: msgError } = await messagesQuery;
 
     if (msgError) {
       console.error('Error fetching messages:', msgError);
@@ -75,7 +65,7 @@ serve(async (req) => {
     }
 
     // Get unique student IDs
-    const studentIds = [...new Set(conversations.map(c => c.student_id))];
+    const studentIds = [...new Set((messages || []).map(m => (m.conversations as any).student_id))];
     
     // Fetch profiles for these students
     const { data: profiles, error: profilesError } = await supabase
@@ -92,117 +82,62 @@ serve(async (req) => {
       (profiles || []).map(p => [p.id, p.name])
     );
 
-    // Create conversation to student map
-    const convToStudent = new Map(
-      conversations.map(c => [c.id, c.student_id])
-    );
+    if (msgError) {
+      console.error('Error fetching messages:', msgError);
+      throw msgError;
+    }
 
     console.log('Retrieved messages:', messages?.length || 0);
 
-    // Calculate KPIs and aggregations
-    const studentMessages = (messages || []).filter(m => m.sender === 'student');
-    const tutorMessages = (messages || []).filter(m => m.sender === 'tutor');
-    
-    const confusedCount = studentMessages.filter(m => m.confusion_flag).length;
-    const groundedCount = tutorMessages.filter(m => m.grounded !== false).length;
-    
-    const confused_pct = studentMessages.length > 0 
-      ? Math.round((confusedCount / studentMessages.length) * 100) 
-      : 0;
-    
-    const grounded_rate = tutorMessages.length > 0
-      ? Math.round((groundedCount / tutorMessages.length) * 100)
-      : 100;
-
-    // Aggregate by question number (confused only)
+    // Aggregate by question number
     const questionCounts: Record<number, number> = {};
-    studentMessages.forEach(msg => {
-      if (msg.question_number !== null && msg.confusion_flag) {
+    const topicCounts: Record<string, number> = {};
+    let confusedCount = 0;
+
+    (messages || []).forEach(msg => {
+      if (msg.question_number !== null) {
         questionCounts[msg.question_number] = (questionCounts[msg.question_number] || 0) + 1;
       }
-    });
-
-    // Aggregate by topic (confused only)
-    const topicCounts: Record<string, number> = {};
-    studentMessages.forEach(msg => {
-      if (msg.topic_tag && msg.confusion_flag) {
+      if (msg.topic_tag) {
         topicCounts[msg.topic_tag] = (topicCounts[msg.topic_tag] || 0) + 1;
+      }
+      if (msg.confusion_flag) {
+        confusedCount++;
       }
     });
 
     // Format for charts
-    const by_question = Object.entries(questionCounts)
-      .map(([question, count]) => ({ question: parseInt(question), confused: count }))
-      .sort((a, b) => b.confused - a.confused);
+    const messagesByQuestion = Object.entries(questionCounts)
+      .map(([question, count]) => ({ question: parseInt(question), count }))
+      .sort((a, b) => b.count - a.count);
 
-    const topics = Object.entries(topicCounts)
-      .map(([topic, count]) => ({ topic, confused: count }))
-      .sort((a, b) => b.confused - a.confused)
-      .slice(0, 5); // Top 5
+    const messagesByTopic = Object.entries(topicCounts)
+      .map(([topic, count]) => ({ topic, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 10); // Top 10 topics
 
-    // Get top question and topic
-    const top_question = by_question.length > 0 ? by_question[0].question : null;
-    const top_topic = topics.length > 0 ? topics[0].topic : null;
-
-    // Get students needing help (those with confused messages)
-    const confusedStudentIds = new Set<string>();
-    const studentLastConfused = new Map<string, { 
-      question: number | null, 
-      topic: string | null, 
-      last_ts: string,
-      conversation_id: string,
-      text: string 
-    }>();
-
-    studentMessages.forEach(msg => {
-      if (msg.confusion_flag) {
-        const studentId = convToStudent.get(msg.conversation_id);
-        if (studentId) {
-          confusedStudentIds.add(studentId);
-          
-          // Track most recent confused message per student
-          const existing = studentLastConfused.get(studentId);
-          if (!existing || new Date(msg.created_at) > new Date(existing.last_ts)) {
-            studentLastConfused.set(studentId, {
-              question: msg.question_number,
-              topic: msg.topic_tag,
-              last_ts: msg.created_at,
-              conversation_id: msg.conversation_id,
-              text: msg.text
-            });
-          }
-        }
-      }
-    });
-
-    const students = Array.from(confusedStudentIds).map(studentId => {
-      const lastConfused = studentLastConfused.get(studentId)!;
+    // Recent messages with student names
+    const recentMessages = (messages || []).slice(0, 50).map(msg => {
+      const studentId = (msg.conversations as any)?.student_id;
       return {
-        student_id: studentId,
-        student_name: studentNames.get(studentId) || 'Unknown',
-        question: lastConfused.question,
-        topic: lastConfused.topic,
-        last_ts: lastConfused.last_ts,
-        conversation_id: lastConfused.conversation_id,
-        confused: true,
-        last_message: lastConfused.text.substring(0, 100)
+        id: msg.id,
+        studentName: studentNames.get(studentId) || 'Unknown',
+        text: msg.text.substring(0, 200), // First 200 chars
+        questionNumber: msg.question_number,
+        topicTag: msg.topic_tag,
+        confusionFlag: msg.confusion_flag,
+        createdAt: msg.created_at,
+        conversationId: msg.conversation_id
       };
-    }).sort((a, b) => new Date(b.last_ts).getTime() - new Date(a.last_ts).getTime());
-
-    const kpis = {
-      confused_pct,
-      students_needing_help: confusedStudentIds.size,
-      top_question,
-      top_topic,
-      grounded_rate
-    };
+    });
 
     return new Response(
       JSON.stringify({
-        kpis,
-        by_question,
-        topics,
-        students
+        messagesByQuestion,
+        messagesByTopic,
+        recentMessages,
+        confusedMessages: confusedCount,
+        totalMessages: (messages || []).length
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );

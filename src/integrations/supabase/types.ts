@@ -241,7 +241,6 @@ export type Database = {
           confusion_flag: boolean | null
           conversation_id: string
           created_at: string | null
-          grounded: boolean | null
           id: string
           question_number: number | null
           sender: string
@@ -252,7 +251,6 @@ export type Database = {
           confusion_flag?: boolean | null
           conversation_id: string
           created_at?: string | null
-          grounded?: boolean | null
           id?: string
           question_number?: number | null
           sender: string
@@ -263,7 +261,6 @@ export type Database = {
           confusion_flag?: boolean | null
           conversation_id?: string
           created_at?: string | null
-          grounded?: boolean | null
           id?: string
           question_number?: number | null
           sender?: string
