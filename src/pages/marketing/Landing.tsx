@@ -15,44 +15,27 @@ import AnalyticsDonut from "@/components/marketing/AnalyticsDonut";
 import MiniBars from "@/components/marketing/MiniBars";
 import GuardrailsMock from "@/components/marketing/GuardrailsMock";
 const Landing = () => {
-  const [user, setUser] = useState<any>(null);
-  const [role, setRole] = useState<string | null>(null);
   useEffect(() => {
-    document.title = "Socratica - Guided AI for students, clear insights for teachers";
-    supabase.auth.getSession().then(({
-      data: {
-        session
-      }
-    }) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        supabase.from('user_roles').select('role').eq('user_id', session.user.id).single().then(({
-          data
-        }) => {
-          setRole(data?.role ?? null);
-        });
-      }
-    });
+    document.title = "Socratica - Advanced Analytics for Google Classroom";
   }, []);
-  const dashboardPath = role === "teacher" ? "/app/teacher" : "/app/student";
+
   return <div className="min-h-screen bg-background">
       <Navbar />
       
       {/* Hero Section */}
       <section className="container mx-auto px-6 pt-32 pb-20">
         <div className="max-w-4xl mx-auto text-center space-y-8">
+          <Badge variant="outline" className="mb-4">K-12 • Currently testing in higher education</Badge>
           <h1 className="font-serif text-6xl md:text-7xl font-bold tracking-tight leading-[1.1] text-foreground">
-            Guided AI for students.<br />
-            Clear insights for teachers.
+            See why students struggle,<br />
+            not just what they got wrong.
           </h1>
           <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            The AI tutor that teaches critical thinking instead of doing the homework.
+            Socratica is the advanced analytics platform for Google Classroom that reveals the thinking behind every answer.
           </p>
           <div className="flex gap-4 justify-center pt-4">
             <Button asChild size="lg" className="h-12 px-8 text-base font-medium">
-              <Link to={user ? dashboardPath : "/auth"}>
-                {user ? "Continue to app" : "Get started"}
-              </Link>
+              <a href="mailto:eli.polterovich@mail.mcgill.ca">Request early access</a>
             </Button>
             <Button asChild variant="outline" size="lg" className="h-12 px-8 text-base font-medium border-2">
               <Link to="/pricing">View pricing</Link>
@@ -62,7 +45,7 @@ const Landing = () => {
       </section>
 
       <h3 className="text-center text-lg font-medium text-muted-foreground pt-12 pb-8">
-        Profs from these schools can&apos;t wait to test Socratica
+        Currently piloting with educators from
       </h3>
 
       {/* University Logos */}
@@ -87,10 +70,10 @@ const Landing = () => {
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="font-serif text-4xl md:text-5xl font-bold tracking-tight text-foreground mb-4">
-              Built for modern education
+              Transform invisible learning gaps into actionable insights
             </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Everything you need to maintain rigor while supporting student learning
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              By providing an AI tutor that assists students with your coursework, Socratica captures real-time data on their thought processes to generate detailed Understanding Scores for every concept.
             </p>
           </div>
 
@@ -99,28 +82,28 @@ const Landing = () => {
             <div className="grid md:grid-cols-2 gap-16 items-center">
               <div className="space-y-4">
                 <h3 className="font-serif text-3xl font-bold text-foreground">
-                  See where students struggle
+                  Understanding Scores, not just grades
                 </h3>
                 <p className="text-lg text-muted-foreground leading-relaxed">
-                  Visual analytics show which assignment questions generate the most help requests and which topics cause confusion. Identify knowledge gaps before the next class and adjust your instruction accordingly.
+                  Go far beyond the gradebook. See detailed comprehension metrics for every concept, identify which students truly understand the material versus those who got lucky, and pinpoint exactly where confusion begins.
                 </p>
               </div>
               <div className="rounded-lg overflow-hidden border border-border shadow-lg bg-background transition-all duration-300 hover:shadow-2xl hover:scale-[1.02]">
-                <img src={analyticsScreenshot} alt="Analytics dashboard showing student engagement metrics and confusion topics" className="w-full h-auto" />
+                <img src={analyticsScreenshot} alt="Analytics dashboard showing Understanding Scores and comprehension metrics" className="w-full h-auto" />
               </div>
             </div>
 
             {/* Chat Interface */}
             <div className="grid md:grid-cols-2 gap-16 items-center">
               <div className="order-2 md:order-1 rounded-lg overflow-hidden border border-border shadow-lg bg-background transition-all duration-300 hover:shadow-2xl hover:scale-[1.02]">
-                <img src={chatScreenshot} alt="Student chat interface with PDF assignment and Socratic tutoring" className="w-full h-auto" />
+                <img src={chatScreenshot} alt="Student chat interface with AI tutor capturing thought process" className="w-full h-auto" />
               </div>
               <div className="order-1 md:order-2 space-y-4">
                 <h3 className="font-serif text-3xl font-bold text-foreground">
-                  Guided learning, not answers
+                  Capture the thinking, not just the answer
                 </h3>
                 <p className="text-lg text-muted-foreground leading-relaxed">
-                  Students work alongside their assignment materials while the AI tutor asks clarifying questions. No direct solutions, just Socratic guidance that builds critical thinking and problem-solving skills.
+                  The AI tutor guides students through Socratic questioning while capturing their reasoning process. Every interaction becomes a data point, revealing how students approach problems and where their understanding breaks down.
                 </p>
               </div>
             </div>
@@ -188,15 +171,13 @@ const Landing = () => {
         <div className="container mx-auto px-6">
           <div className="max-w-3xl mx-auto text-center space-y-8">
             <h2 className="font-serif text-4xl md:text-5xl font-bold tracking-tight">
-              Ready to transform your classroom?
+              Get a data-driven view of your class's comprehension
             </h2>
             <p className="text-xl text-background/80 leading-relaxed">
-              Join hundreds of educators using Socratica to enhance student learning and gain valuable insights.
+              Join K-12 educators getting early access to Socratica. Currently piloting in higher education.
             </p>
             <Button asChild size="lg" variant="secondary" className="h-12 px-8 text-base font-medium">
-              <Link to={user ? dashboardPath : "/auth"}>
-                {user ? "Go to dashboard" : "Get started free"}
-              </Link>
+              <a href="mailto:eli.polterovich@mail.mcgill.ca">Request early access</a>
             </Button>
           </div>
         </div>
@@ -209,7 +190,7 @@ const Landing = () => {
             <div className="space-y-4">
               <h3 className="font-serif text-2xl font-bold text-foreground">Socratica</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Guided AI for students, clear insights for teachers.
+                Advanced analytics for Google Classroom.
               </p>
             </div>
             

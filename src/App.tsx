@@ -67,37 +67,14 @@ const App = () => (
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
           
-          {/* Auth */}
-          <Route path="/auth" element={<Auth />} />
+          {/* Auth - hidden for now */}
+          <Route path="/auth" element={<Navigate to="/" replace />} />
           
-          {/* Protected app routes */}
-          <Route
-            path="/app/teacher"
-            element={
-              <RequireAuth>
-                <TeacherDashboard />
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="/app/student"
-            element={
-              <RequireAuth>
-                <StudentDashboard />
-              </RequireAuth>
-            }
-          />
-          <Route
-            path="/app/chat/:conversationId"
-            element={
-              <RequireAuth>
-                <Chat />
-              </RequireAuth>
-            }
-          />
-          
-          {/* Legacy route redirects */}
-          <Route path="/chat/:conversationId" element={<Navigate to="/app/chat/:conversationId" replace />} />
+          {/* Protected app routes - hidden for now */}
+          <Route path="/app/teacher" element={<Navigate to="/" replace />} />
+          <Route path="/app/student" element={<Navigate to="/" replace />} />
+          <Route path="/app/chat/:conversationId" element={<Navigate to="/" replace />} />
+          <Route path="/chat/:conversationId" element={<Navigate to="/" replace />} />
           
           {/* Catch all */}
           <Route path="*" element={<NotFound />} />
