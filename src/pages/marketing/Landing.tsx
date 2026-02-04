@@ -25,20 +25,16 @@ const Landing = () => {
       {/* Hero Section */}
       <section className="container mx-auto px-6 pt-32 pb-20">
         <div className="max-w-4xl mx-auto text-center space-y-8">
-          <Badge variant="outline" className="mb-4">K-12 • Currently testing in higher education</Badge>
           <h1 className="font-serif text-6xl md:text-7xl font-bold tracking-tight leading-[1.1] text-foreground">
-            See why students struggle,<br />
-            not just what they got wrong.
+            Guided AI for students.<br />
+            Clear insights for teachers.
           </h1>
           <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Socratica is the advanced analytics platform for Google Classroom that reveals the thinking behind every answer.
+            The AI tutor that teaches critical thinking instead of doing the homework.
           </p>
           <div className="flex gap-4 justify-center pt-4">
             <Button asChild size="lg" className="h-12 px-8 text-base font-medium">
               <a href="mailto:eli.polterovich@mail.mcgill.ca">Request early access</a>
-            </Button>
-            <Button asChild variant="outline" size="lg" className="h-12 px-8 text-base font-medium border-2">
-              <Link to="/pricing">View pricing</Link>
             </Button>
           </div>
         </div>
