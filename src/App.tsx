@@ -62,8 +62,8 @@ const App = () => (
         <Routes>
           {/* Marketing routes */}
           <Route path="/" element={<Landing />} />
-          <Route path="/pricing" element={<Pricing />} />
-          <Route path="/mission" element={<Mission />} />
+          <Route path="/pricing" element={<Navigate to="/" replace />} />
+          <Route path="/mission" element={<Navigate to="/" replace />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
           
