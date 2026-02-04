@@ -9,10 +9,7 @@ const Navbar = () => {
           <span className="font-serif text-3xl font-extrabold text-foreground tracking-tight">Socratica</span>
         </Link>
         
-        <div className="flex items-center gap-6">
-          <Link to="/mission" className="text-sm font-medium text-foreground/80 hover:text-foreground transition-colors">
-            Our Mission
-          </Link>
+        <div className="flex items-center">
           <Button asChild size="sm">
             <a href="mailto:eli.polterovich@mail.mcgill.ca">Request early access</a>
           </Button>
